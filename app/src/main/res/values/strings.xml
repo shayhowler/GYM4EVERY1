@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" tools:ignore="Typos">GYM4EVERY1</string>
+    <string name="step_into_y">STEP INTO\nYOUR\nNEW JOURNEY</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="create_your_account">CREATE YOUR\nACCOUNT</string>
+    <string name="sign_in_screen">SIGN IN TO REACH\n YOUR GOALS</string>
+    <string name="forgot_password">FORGOT YOUR\nPASSWORD ?</string>
+    <string name="reset_password">ENTER YOUR\nNEW PASSWORD</string>
+</resources>
