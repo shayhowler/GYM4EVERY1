@@ -23,54 +23,5 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".routes.auth_routes.ForgotPasswordActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.auth_routes.SignInActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.auth_routes.SignUp1Activity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.auth_routes.SignUp2Activity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.GetStartedActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.WeightPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.HeightPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.BirthdayPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.ActivityPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.GoalPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.start_routes.SuccessPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
-            android:name=".routes.feed.FeedPageActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-
     </application>
 </manifest>
