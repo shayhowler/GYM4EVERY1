@@ -1,9 +1,6 @@
 package com.gym4every1.routes.start_routes
 
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -22,41 +19,24 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.models.auth_models.Profile
 import com.gym4every1.models.auth_models.User
-import com.gym4every1.routes.shared.Routes
 import com.gym4every1.singletons.ProfileViewModel
-import com.gym4every1.singletons.SupabaseClientManager
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import java.time.format.DateTimeFormatter
 
-class SuccessPageActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val supabaseClient = SupabaseClientManager.getSupabaseClient(this)
-
-        setContent {
-            SuccessPageScreen(
-                supabaseClient = supabaseClient,
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "pageFeed" -> Routes.navigateToFeedPage(this)
-                    }
-                }
-            )
-        }
-    }
-}
 
 @Composable
 fun SuccessPageScreen(
+    navController: NavController,
     supabaseClient: SupabaseClient,
-    onNavigate: (String) -> Unit,
+    profileViewModel: ProfileViewModel
 ) {
     var animationCompleted by remember { mutableStateOf(false) }
 
@@ -110,6 +90,7 @@ fun SuccessPageScreen(
         }
 
         animationCompleted = true
+        profileViewModel.clear()
     }
 
     Box(
@@ -130,7 +111,7 @@ fun SuccessPageScreen(
 
     LaunchedEffect(key1 = scale) {
         if (scale == 10f) { // When animation completes
-            onNavigate("pageFeed")
+            navController.navigate("feedPage")
         }
     }
 }

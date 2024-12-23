@@ -1,11 +1,9 @@
 package com.gym4every1.routes.auth_routes
 
-import android.os.Bundle
+import android.content.Context
 import android.text.TextUtils.isEmpty
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,11 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
@@ -45,10 +44,9 @@ import com.gym4every1.models.auth_models.Profile
 import com.gym4every1.models.auth_models.User
 import com.gym4every1.routes.shared.CustomTextFieldWithIcon
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.Routes
 import com.gym4every1.routes.shared.isValidEmail
 import com.gym4every1.routes.shared.validateFields
-import com.gym4every1.singletons.SupabaseClientManager
+import com.gym4every1.singletons.SignUpViewModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -57,36 +55,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SignInActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val supabaseClient = SupabaseClientManager.getSupabaseClient(this)
-
-        setContent {
-            SignInScreen(
-                supabaseClient = supabaseClient, // Pass supabaseClient here
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "get_started" -> Routes.navigateToGetStarted(this)
-                        "feed" -> Routes.navigateToFeedPage(this)
-                        "sign_up" -> Routes.navigateToSignUp1(this)
-                        "auth_home" -> Routes.navigateToAuthHome(this)
-                        "forgot_password" -> Routes.navigateToForgotPassword(this)
-                    }
-                }
-            )
-        }
-    }
-}
-
 @Composable
 fun SignInScreen(
+    navController: NavController,
     supabaseClient: SupabaseClient,
-    onNavigate: (String) -> Unit
+    context: Context,
+    signUpViewModel: SignUpViewModel
 ) {
-    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        signUpViewModel.clear()
+    }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -157,7 +135,7 @@ fun SignInScreen(
                 color = Color(0xFFED4747),
                 fontSize = 14.sp,
                 modifier = Modifier.clickable {
-                    onNavigate("forgot_password")
+                    navController.navigate("forgotPassword")
                 }
             )
 
@@ -208,7 +186,7 @@ fun SignInScreen(
                                 if (existingUser != null) {
                                     // If username is null, navigate to SignUp1Activity
                                     if (existingUser.username == null) {
-                                        onNavigate("sign_up_1") // Use onNavigate for redirection
+                                        navController.navigate("signUp1") // Use onNavigate for redirection
                                     } else {
                                         // Check the profiles table for weight and redirect accordingly
                                         val existingProfiles = supabaseClient.from("profiles")
@@ -218,10 +196,10 @@ fun SignInScreen(
 
                                         // If weight data exists, navigate to FeedPageActivity
                                         if (userProfile?.weight != null) {
-                                            onNavigate("feed") // Use onNavigate for redirection
+                                            navController.navigate("feedPage") // Use onNavigate for redirection
                                         } else {
                                             // Otherwise, navigate to GetStartedActivity
-                                            onNavigate("get_started") // Use onNavigate for redirection
+                                            navController.navigate("getStarted") // Use onNavigate for redirection
                                         }
                                     }
                                 } else {
@@ -261,7 +239,7 @@ fun SignInScreen(
                         color = Color(0xFFED4747),
                         fontSize = 16.sp,
                         modifier = Modifier.clickable {
-                            onNavigate("sign_up")
+                            navController.navigate("signUp1")
                         }
                     )
                 }
@@ -271,7 +249,7 @@ fun SignInScreen(
                     textAlign = TextAlign.Center,
                     color = Color(0xFFED4747),
                     fontSize = 16.sp,
-                    modifier = Modifier.clickable { onNavigate("auth_home") }
+                    modifier = Modifier.clickable { navController.navigate("authHome") }
                 )
             }
         }

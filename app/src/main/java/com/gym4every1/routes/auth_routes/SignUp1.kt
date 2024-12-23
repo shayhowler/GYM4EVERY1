@@ -1,9 +1,6 @@
 package com.gym4every1.routes.auth_routes
 
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,40 +26,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.routes.shared.CustomTextFieldWithIcon
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.Routes
 import com.gym4every1.routes.shared.isValidEmail
 import com.gym4every1.singletons.SignUpViewModel
 
-class SignUp1Activity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Directly access the SignUpViewModel singleton
-        val signUpViewModel = SignUpViewModel
-
-        setContent {
-            SignUp1Screen(
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "sign_in" -> Routes.navigateToSignIn(this)
-                        "sign_up2" -> Routes.navigateToSignUp2(this)
-                        "auth_home" -> Routes.navigateToAuthHome(this)
-                    }
-                },
-                viewModel = signUpViewModel
-            )
-        }
-    }
-}
 
 @Composable
-fun SignUp1Screen(onNavigate: (String) -> Unit, viewModel: SignUpViewModel) {
+fun SignUp1Screen(navController: NavController, viewModel: SignUpViewModel) {
     val context = LocalContext.current
     Box(
         modifier = Modifier.fillMaxSize()
@@ -134,7 +109,7 @@ fun SignUp1Screen(onNavigate: (String) -> Unit, viewModel: SignUpViewModel) {
             RectBgButton(
                 onClick = {
                     if (viewModel.fullName.isNotEmpty() && isValidEmail(viewModel.email)) {
-                        onNavigate("sign_up2")
+                        navController.navigate("signUp2")
                     } else {
                         Toast.makeText(context, "Please fill in all fields correctly", Toast.LENGTH_SHORT).show()
                     }
@@ -156,7 +131,7 @@ fun SignUp1Screen(onNavigate: (String) -> Unit, viewModel: SignUpViewModel) {
                     color = Color(0xFFED4747),
                     fontSize = 16.sp,
                     modifier = Modifier.clickable {
-                        onNavigate("sign_in")
+                        navController.navigate("signIn")
                     }
                 )
             }
@@ -166,7 +141,7 @@ fun SignUp1Screen(onNavigate: (String) -> Unit, viewModel: SignUpViewModel) {
                 textAlign = TextAlign.Center,
                 color = Color(0xFFED4747),
                 fontSize = 16.sp,
-                modifier = Modifier.clickable { onNavigate("auth_home") }
+                modifier = Modifier.clickable { navController.navigate("authHome") }
             )
         }
     }

@@ -28,10 +28,6 @@
             android:exported="true"
             android:theme="@style/Theme.GYM4EVERY1" />
         <activity
-            android:name=".routes.auth_routes.AuthHomeActivity"
-            android:exported="true"
-            android:theme="@style/Theme.GYM4EVERY1" />
-        <activity
             android:name=".routes.auth_routes.SignInActivity"
             android:exported="true"
             android:theme="@style/Theme.GYM4EVERY1" />

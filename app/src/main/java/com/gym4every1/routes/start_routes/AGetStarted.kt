@@ -1,8 +1,5 @@
 package com.gym4every1.routes.start_routes
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,32 +23,22 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.Routes
-
-class GetStartedActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Set the content view
-        setContent {
-            GetStartedScreen(
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "pageWeight" -> Routes.navigateToWeightPage(this)
-
-                    }
-                }
-            )
-        }
-    }
-}
+import com.gym4every1.singletons.ProfileViewModel
+import com.gym4every1.singletons.SignUpViewModel
 
 @Composable
 fun GetStartedScreen(
-    onNavigate: (String) -> Unit
+    navController: NavController,
+    signUpViewModel: SignUpViewModel,
+    profileViewModel: ProfileViewModel,
 ) {
+    LaunchedEffect(Unit) {
+        signUpViewModel.clear()
+        profileViewModel.clear()
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -87,7 +75,7 @@ fun GetStartedScreen(
             Spacer(modifier = Modifier.height(10.dp))
             RectBgButton(
                 onClick = {
-                    onNavigate("pageWeight")
+                    navController.navigate("weightPage")
                 },
                 buttonText = "Get Started",
                 modifier = Modifier

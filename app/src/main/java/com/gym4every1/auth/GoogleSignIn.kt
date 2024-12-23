@@ -1,6 +1,5 @@
 package com.gym4every1.auth
 
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -31,15 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.navigation.NavController
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.gym4every1.BuildConfig
 import com.gym4every1.R
 import com.gym4every1.models.auth_models.Profile
 import com.gym4every1.models.auth_models.User
-import com.gym4every1.routes.auth_routes.SignUp1Activity
-import com.gym4every1.routes.start_routes.GetStartedActivity
-import com.gym4every1.routes.feed.FeedPageActivity
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
@@ -51,7 +48,7 @@ import java.security.MessageDigest
 import java.util.UUID
 
 @Composable
-fun GoogleSignInButton(supabase: SupabaseClient) {
+fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -101,7 +98,7 @@ fun GoogleSignInButton(supabase: SupabaseClient) {
                     if (existingUser != null) {
                         // If username is null, redirect to SignUp1Activity
                         if (existingUser.username == null) {
-                            context.startActivity(Intent(context, SignUp1Activity::class.java))
+                            navController.navigate("signUp1")
                         } else {
                             // Check the profiles table for weight and redirect accordingly
                             val existingProfiles = supabase.from("profiles")
@@ -112,9 +109,9 @@ fun GoogleSignInButton(supabase: SupabaseClient) {
 
                             // If weight data exists, go to FeedActivity
                             if (userProfile?.weight != null) {
-                                context.startActivity(Intent(context, FeedPageActivity::class.java))
+                                navController.navigate("feedPage")
                             } else {
-                                context.startActivity(Intent(context, GetStartedActivity::class.java))
+                                navController.navigate("getStarted")
                             }
                         }
                     } else {
@@ -129,7 +126,7 @@ fun GoogleSignInButton(supabase: SupabaseClient) {
                                 "answer" to null
                             )
                         )
-                        context.startActivity(Intent(context, SignUp1Activity::class.java))
+                        navController.navigate("signUp1")
                     }
 
                     Toast.makeText(context, "Sign-In Successful!", Toast.LENGTH_SHORT).show()

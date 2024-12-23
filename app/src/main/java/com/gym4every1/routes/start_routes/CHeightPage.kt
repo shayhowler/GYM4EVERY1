@@ -1,15 +1,24 @@
 package com.gym4every1.routes.start_routes
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,38 +27,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.Routes
 import com.gym4every1.singletons.ProfileViewModel
 import kotlinx.coroutines.flow.collectLatest
 
-class HeightPageActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val profileViewModel = ProfileViewModel
-
-        setContent {
-            HeightPageScreen(
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "pageWeight" -> Routes.navigateToWeightPage(this)
-                        "pageBirthday" -> Routes.navigateToBirthdayPage(this)
-
-                    }
-                },
-                viewModel = profileViewModel
-            )
-        }
-    }
-}
-
 @Composable
 fun HeightPageScreen(
-    onNavigate: (String) -> Unit, viewModel: ProfileViewModel
+    navController: NavController, viewModel: ProfileViewModel
 ) {
     // Define the height range and initial value.
     val minHeight = 140 // Minimum height in cm.
@@ -156,7 +144,7 @@ fun HeightPageScreen(
         // Continue Button Section
         RectBgButton(
             onClick = {
-                onNavigate("pageBirthday")
+                navController.navigate("pageBirthday")
             },
             buttonText = "Continue",
             modifier = Modifier
@@ -164,7 +152,7 @@ fun HeightPageScreen(
                 .padding(16.dp)
                 .height(60.dp)
         )
-        IconButton(onClick = { onNavigate("pageWeight") }) {
+        IconButton(onClick = { navController.navigate("pageWeight") }) {
             FaIcon(
                 FaIcons.ArrowLeft, // Using the ArrowLeft icon for back
                 modifier = Modifier.size(30.dp)

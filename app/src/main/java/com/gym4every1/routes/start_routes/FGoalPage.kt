@@ -17,37 +17,16 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.Routes
 import com.gym4every1.singletons.ProfileViewModel
-
-class GoalPageActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val profileViewModel = ProfileViewModel
-
-        setContent {
-            GoalPageScreen(
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "pageActivity" -> Routes.navigateToActivityPage(this)
-                        "pageSuccess" -> Routes.navigateToSuccessPage(this)
-                    }
-                },
-                viewModel = profileViewModel
-            )
-        }
-    }
-}
 
 @Composable
 fun GoalPageScreen(
-    onNavigate: (String) -> Unit, viewModel: ProfileViewModel
+    navController: NavController, viewModel: ProfileViewModel
 ) {
     var selectedGoal by remember { mutableIntStateOf(1) }
 
@@ -102,7 +81,7 @@ fun GoalPageScreen(
             RectBgButton(
                 onClick = {
                     viewModel.goal = selectedGoal
-                    onNavigate("pageSuccess")
+                    navController.navigate("successPage")
                 },
                 buttonText = "Done",
                 modifier = Modifier
@@ -111,7 +90,7 @@ fun GoalPageScreen(
                     .padding(bottom = 16.dp)
             )
             IconButton(
-                onClick = { onNavigate("pageActivity") },
+                onClick = { navController.navigate("activityPage") },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             ) {

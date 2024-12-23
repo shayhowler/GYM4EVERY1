@@ -1,8 +1,5 @@
 package com.gym4every1.routes.start_routes
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,33 +25,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.Routes
 import com.gym4every1.singletons.ProfileViewModel
 import kotlinx.coroutines.flow.collectLatest
 
-class WeightPageActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val profileViewModel = ProfileViewModel
-        setContent {
-            WeightPageScreen(
-                onNavigate = { navigateTo ->
-                    when (navigateTo) {
-                        "pageHeight" -> Routes.navigateToHeightPage(this)
-                        
-                    }
-                },
-                viewModel = profileViewModel
-            )
-        }
-    }
-}
-
 @Composable
 fun WeightPageScreen(
-    onNavigate: (String) -> Unit, viewModel: ProfileViewModel
+    navController: NavController, viewModel: ProfileViewModel
 ) {
     // Define the weight range and initial value.
     val minWeight = 30 // Minimum weight in kg.
@@ -161,7 +140,7 @@ fun WeightPageScreen(
         // Continue Button Section
         RectBgButton(
             onClick = {
-                    onNavigate("pageHeight")
+                    navController.navigate("heightPage")
             },
             buttonText = "Continue",
             modifier = Modifier

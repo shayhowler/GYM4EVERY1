@@ -101,6 +101,7 @@ dependencies {
 
     // Navigation Compose for navigation
     implementation(libs.androidx.navigation.compose)
+    implementation("androidx.activity:activity-compose:1.9.3")
 
     // Core AndroidX libraries
     implementation(libs.androidx.core.ktx)

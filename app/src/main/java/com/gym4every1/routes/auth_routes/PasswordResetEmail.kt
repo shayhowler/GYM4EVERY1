@@ -1,18 +1,12 @@
 package com.gym4every1.routes.auth_routes
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +18,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
@@ -31,26 +26,13 @@ import com.gym4every1.auth.sendPasswordResetEmail
 import com.gym4every1.routes.shared.CustomTextFieldWithIcon
 import com.gym4every1.routes.shared.RectBgButton
 import com.gym4every1.routes.shared.isValidEmail
-import com.gym4every1.singletons.SupabaseClientManager
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ForgotPasswordActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Initialize SupabaseClient here, if needed
-        val supabaseClient = SupabaseClientManager.getSupabaseClient(this)
-        setContent {
-            PasswordResetScreen(supabaseClient, this)
-        }
-    }
-}
-
 @Composable
-fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
+fun PasswordResetScreen(navController: NavController, supabaseClient: SupabaseClient, context: Context) {
     val email = remember { mutableStateOf("") }
 
     val onEmailSubmitted: (String) -> Unit = { userEmail ->
@@ -61,8 +43,7 @@ fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
                     userEmail = userEmail,
                     onSuccess = {
                         Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_SHORT).show()
-                        context.startActivity(Intent(context, AuthHomeActivity::class.java))
-                        (context as ForgotPasswordActivity).finish()
+                        navController.navigate("authHome") // Navigate to auth home after success
                     },
                     onError = { error ->
                         Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
@@ -148,8 +129,7 @@ fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
                 fontSize = 16.sp,
                 modifier = Modifier
                     .clickable {
-                        context.startActivity(Intent(context, AuthHomeActivity::class.java))
-                        (context as ForgotPasswordActivity).finish()
+                        navController.navigate("authHome") // Navigate to auth home on click
                     }
             )
         }
