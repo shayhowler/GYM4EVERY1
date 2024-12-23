@@ -1,22 +1,25 @@
 package com.gym4every1.routes.start_routes
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -24,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
-import kotlin.jvm.java
+import com.gym4every1.routes.shared.Routes
 
 class GetStartedActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,9 +36,11 @@ class GetStartedActivity : ComponentActivity() {
         // Set the content view
         setContent {
             GetStartedScreen(
-                onGetStartedClick = {
-                    val intent = Intent(this, FirstQuestionPageActivity::class.java)
-                    startActivity(intent)
+                onNavigate = { navigateTo ->
+                    when (navigateTo) {
+                        "pageWeight" -> Routes.navigateToWeightPage(this)
+
+                    }
                 }
             )
         }
@@ -44,7 +49,7 @@ class GetStartedActivity : ComponentActivity() {
 
 @Composable
 fun GetStartedScreen(
-    onGetStartedClick: () -> Unit
+    onNavigate: (String) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -52,45 +57,43 @@ fun GetStartedScreen(
             .background(Color.White)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.get_started),
+            painter = painterResource(id = R.mipmap.getstarted),
             contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
-                .fillMaxSize()
-                .offset((0).dp, (-170).dp)
                 .align(Alignment.TopCenter)
-        )
-        // Title Text
-        Text(
-            text = "Wherever You Are\n Thrive and Go Far",
-            fontSize = 26.sp,
-            color = Color.Black,
-            fontFamily = FontFamily(Font(R.font.lato_black)),
-            modifier = Modifier
-                .padding(top = 152.dp)
-                .offset(y = 455.dp)
-                .align(Alignment.TopCenter)
-        )
-
-        Text(
-            text = "Wellness takes time, find your rhyme",
-            fontSize = 20.sp,
-            color = Color.Black,
-            fontFamily = FontFamily(Font(R.font.lato)),
-            modifier = Modifier
-                .padding(top = 152.dp)
-                .offset(y = 550.dp)
-                .align(Alignment.TopCenter)
-        )
-
-        RectBgButton(
-            onClick = onGetStartedClick,
-            buttonText = "Get Started",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .height(60.dp)
-                .offset(y = (-40).dp)
-                .align(Alignment.BottomCenter)
-        )
+                .padding(top = (LocalConfiguration.current.screenHeightDp * 0.7).dp)
+        ) {
+            // Title Text
+            Text(
+                text = "Wherever You Are\n Thrive and Go Far",
+                fontSize = 26.sp,
+                color = Color.Black,
+                fontFamily = FontFamily(Font(R.font.lato_black)),
+                modifier = Modifier
+            )
+            Text(
+                text = "Wellness takes time, find your rhyme",
+                fontSize = 20.sp,
+                color = Color.Black,
+                fontFamily = FontFamily(Font(R.font.lato)),
+                modifier = Modifier
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            RectBgButton(
+                onClick = {
+                    onNavigate("pageWeight")
+                },
+                buttonText = "Get Started",
+                modifier = Modifier
+                    .width(360.dp)
+                    .height(60.dp)
+            )
+        }
     }
 }

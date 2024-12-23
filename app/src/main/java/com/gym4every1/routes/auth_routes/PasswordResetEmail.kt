@@ -6,17 +6,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -24,10 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +30,6 @@ import com.gym4every1.R
 import com.gym4every1.auth.sendPasswordResetEmail
 import com.gym4every1.routes.shared.CustomTextFieldWithIcon
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.SpecialBox
 import com.gym4every1.routes.shared.isValidEmail
 import com.gym4every1.singletons.SupabaseClientManager
 import io.github.jan.supabase.SupabaseClient
@@ -82,29 +74,23 @@ fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
         }
     }
 
-    SpecialBox(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Title
-        Text(
-            text = stringResource(R.string.forgot_password),
-            textAlign = TextAlign.Center,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontFamily = FontFamily(Font(R.font.lato_black)),
-            modifier = Modifier
-                .padding(top = 152.dp)
-                .align(Alignment.TopCenter)
+        // Background Image
+        Image(
+            painter = painterResource(id = R.mipmap.forgot), // Background image
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-
+        // Form and Content
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 24.dp)
-                .offset(y = 170.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = (LocalConfiguration.current.screenHeightDp * 0.52).dp)
         ) {
             Text(
                 text = "Enter your registered email address.\nWe'll send you a link to reset your password.",
@@ -115,6 +101,7 @@ fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             )
+            // Email Input
             CustomTextFieldWithIcon(
                 value = email.value,
                 onValueChange = { email.value = it },
@@ -123,17 +110,18 @@ fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
                     FaIcon(
                         faIcon = FaIcons.Envelope,
                         modifier = Modifier
-                            .offset(y = 10.dp)
+                            .offset(y = 12.dp)
                             .size(40.dp)
                             .padding(start = 22.dp),
                         tint = if (isValidEmail(email.value)) Color(0xFFED4747) else Color(0xFFD32F2F)
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.width(350.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Send Reset Link Button
             RectBgButton(
                 onClick = {
                     if (isValidEmail(email.value)) {
@@ -152,6 +140,7 @@ fun PasswordResetScreen(supabaseClient: SupabaseClient, context: Context) {
                     .height(60.dp)
             )
 
+            // Back to Menu Button
             Text(
                 text = "Back to Menu",
                 textAlign = TextAlign.Center,

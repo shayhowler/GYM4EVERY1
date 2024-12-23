@@ -1,18 +1,20 @@
 package com.gym4every1.routes.auth_routes
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils.isEmpty
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -28,11 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,14 +41,18 @@ import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.auth.loginUser
+import com.gym4every1.models.auth_models.Profile
+import com.gym4every1.models.auth_models.User
 import com.gym4every1.routes.shared.CustomTextFieldWithIcon
 import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.SpecialBox
+import com.gym4every1.routes.shared.Routes
 import com.gym4every1.routes.shared.isValidEmail
 import com.gym4every1.routes.shared.validateFields
-import com.gym4every1.routes.start_routes.GetStartedActivity
 import com.gym4every1.singletons.SupabaseClientManager
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,48 +69,21 @@ class SignInActivity : ComponentActivity() {
                 supabaseClient = supabaseClient, // Pass supabaseClient here
                 onNavigate = { navigateTo ->
                     when (navigateTo) {
-                        "get_started" -> navigateToGetStarted()
-                        "sign_up" -> navigateToSignUp()
-                        "auth_home" -> navigateToAuthHome()
-                        "forgot_password" -> navigateToForgotPassword()
+                        "get_started" -> Routes.navigateToGetStarted(this)
+                        "feed" -> Routes.navigateToFeedPage(this)
+                        "sign_up" -> Routes.navigateToSignUp1(this)
+                        "auth_home" -> Routes.navigateToAuthHome(this)
+                        "forgot_password" -> Routes.navigateToForgotPassword(this)
                     }
                 }
             )
         }
     }
-
-    private fun navigateToGetStarted() {
-        // Navigate to the Get Started activity
-        val intent = Intent(this, GetStartedActivity::class.java)
-        startActivity(intent)
-        finish()  // Optionally finish this activity
-    }
-
-    private fun navigateToSignUp() {
-        // Navigate to the Sign-Up activity
-        val intent = Intent(this, SignUp1Activity::class.java)
-        startActivity(intent)
-        finish()  // Optionally finish this activity
-    }
-
-    private fun navigateToAuthHome() {
-        // Navigate back to the Auth Home activity
-        val intent = Intent(this, AuthHomeActivity::class.java)
-        startActivity(intent)
-        finish()  // Optionally finish this activity
-    }
-
-    private fun navigateToForgotPassword() {
-        // Navigate to Forgot Password activity
-        val intent = Intent(this, ForgotPasswordActivity::class.java)
-        startActivity(intent)
-        finish()  // Optionally finish this activity
-    }
 }
 
 @Composable
 fun SignInScreen(
-    supabaseClient: SupabaseClient, // Add supabaseClient parameter
+    supabaseClient: SupabaseClient,
     onNavigate: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -114,29 +92,27 @@ fun SignInScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    SpecialBox(
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val topPadding = (screenHeight * 0.52f)
+
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Title Text
-        Text(
-            text = stringResource(R.string.sign_in_screen),
-            textAlign = TextAlign.Center,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontFamily = FontFamily(Font(R.font.lato_black)),
-            modifier = Modifier
-                .padding(top = 152.dp)
-                .offset(0.dp, 30.dp)
-                .align(Alignment.TopCenter)
+        // Background Image
+        Image(
+            painter = painterResource(id = R.mipmap.signin), // Set the new image
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop // Adjust image to fill the screen
         )
 
-        // Form Fields for Sign-In (adjusted position)
+        // Form Fields for Sign-In
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.align(Alignment.Center)
-                .offset(0.dp, 210.dp)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = topPadding)
         ) {
             CustomTextFieldWithIcon(
                 value = email,
@@ -146,7 +122,7 @@ fun SignInScreen(
                     FaIcon(
                         faIcon = FaIcons.Envelope,
                         modifier = Modifier
-                            .offset(y = 10.dp)
+                            .offset(y = 12.dp)
                             .size(40.dp)
                             .padding(start = 22.dp),
                         tint = if (!isValidEmail(email)) Color.Red else Color(0xFFED4747)
@@ -164,7 +140,7 @@ fun SignInScreen(
                     FaIcon(
                         faIcon = FaIcons.Lock,
                         modifier = Modifier
-                            .offset(y = 10.dp)
+                            .offset(y = 12.dp)
                             .size(40.dp)
                             .padding(start = 22.dp),
                         tint = if (isEmpty(password)) Color.Red else Color(0xFFED4747)
@@ -175,6 +151,7 @@ fun SignInScreen(
                 modifier = Modifier.width(300.dp)
             )
 
+            // Forgot Password Link
             Text(
                 text = "Forgot Password?",
                 color = Color(0xFFED4747),
@@ -184,6 +161,7 @@ fun SignInScreen(
                 }
             )
 
+            // Error Message Display
             if (errorMessage.isNotEmpty()) {
                 Text(
                     text = errorMessage,
@@ -192,10 +170,12 @@ fun SignInScreen(
                 )
             }
 
+            // Loading Indicator
             if (isLoading) {
                 CircularProgressIndicator()
             }
 
+            // Sign In Button
             RectBgButton(
                 onClick = {
                     val error = validateFields(
@@ -214,47 +194,86 @@ fun SignInScreen(
 
                     CoroutineScope(Dispatchers.Main).launch {
                         try {
-                            // Call the loginUser function
                             loginUser(supabaseClient, email, password)
 
-                            // On success
                             isLoading = false
                             Toast.makeText(context, "Sign-In successful!", Toast.LENGTH_SHORT).show()
-                            onNavigate("get_started")
+
+                            val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id
+                            if (userId != null) {
+                                val existingUsers = supabaseClient.from("users").select(columns = Columns.list("id, email, username"))
+                                    .decodeList<User>()
+                                val existingUser = existingUsers.firstOrNull { it.email == email }
+
+                                if (existingUser != null) {
+                                    // If username is null, navigate to SignUp1Activity
+                                    if (existingUser.username == null) {
+                                        onNavigate("sign_up_1") // Use onNavigate for redirection
+                                    } else {
+                                        // Check the profiles table for weight and redirect accordingly
+                                        val existingProfiles = supabaseClient.from("profiles")
+                                            .select(columns = Columns.list("id, username, weight, height, dateofbirth, activity_level, weight_goal"))
+                                            .decodeList<Profile>()
+                                        val userProfile = existingProfiles.firstOrNull { it.username == existingUser.username }
+
+                                        // If weight data exists, navigate to FeedPageActivity
+                                        if (userProfile?.weight != null) {
+                                            onNavigate("feed") // Use onNavigate for redirection
+                                        } else {
+                                            // Otherwise, navigate to GetStartedActivity
+                                            onNavigate("get_started") // Use onNavigate for redirection
+                                        }
+                                    }
+                                } else {
+                                    // If the user doesn't exist in the "users" table, handle accordingly
+                                    errorMessage = "User not found"
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         } catch (e: Exception) {
                             isLoading = false
                             errorMessage = e.message ?: "Login failed"
                             Log.e("SignIn", "Error: $errorMessage")
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
                 buttonText = "Sign In",
-                modifier = Modifier.width(327.dp).height(60.dp)
+                modifier = Modifier
+                    .width(327.dp)
+                    .height(60.dp)
             )
 
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(top = 0.dp, bottom = 14.dp)
+            // Footer with Sign-Up and Back to Menu Links
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(top = 14.dp, bottom = 14.dp)
             ) {
-                Text("Don't have an account yet?", fontSize = 16.sp)
-                Spacer(modifier = Modifier.width(4.dp))
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Don't have an account yet?", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "Sign Up",
+                        color = Color(0xFFED4747),
+                        fontSize = 16.sp,
+                        modifier = Modifier.clickable {
+                            onNavigate("sign_up")
+                        }
+                    )
+                }
+
                 Text(
-                    "Sign Up",
+                    text = "Back to Menu",
+                    textAlign = TextAlign.Center,
                     color = Color(0xFFED4747),
                     fontSize = 16.sp,
-                    modifier = Modifier.clickable {
-                        onNavigate("sign_up")
-                    }
+                    modifier = Modifier.clickable { onNavigate("auth_home") }
                 )
             }
-
-            Text(
-                text = "Back to Menu",
-                textAlign = TextAlign.Center,
-                color = Color(0xFFED4747),
-                fontSize = 16.sp,
-                modifier = Modifier.clickable { onNavigate("auth_home") }
-            )
         }
     }
 }

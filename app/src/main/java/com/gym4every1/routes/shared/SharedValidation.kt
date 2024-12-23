@@ -17,7 +17,6 @@ fun validateFields(
         when {
             email.isEmpty() -> "Email is required"
             password.isEmpty() -> "Password is required"
-            password.length < 8 -> "Password must be at least 8 characters long"
             else -> "" // No error
         }
     } else {
@@ -27,7 +26,6 @@ fun validateFields(
             password.isEmpty() -> "Password is required"
             confirmPassword.isEmpty() -> "Confirm Password is required"
             password != confirmPassword -> "Passwords do not match"
-            password.length < 8 -> "Password must be at least 8 characters long"
             else -> "" // No error
         }
     }
