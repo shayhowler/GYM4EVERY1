@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +39,7 @@ fun SignInButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
             .clickable { onClick() }
     ) {
         Text(
-            text = stringResource(R.string.sign_in),
+            text = "SIGN IN",
             color = Color(0xFFED4747),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
@@ -63,7 +62,7 @@ fun SignUpButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
             .clickable { onClick() }
     ) {
         Text(
-            text = stringResource(R.string.sign_up),
+            text = "SIGN UP",
             color = Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,

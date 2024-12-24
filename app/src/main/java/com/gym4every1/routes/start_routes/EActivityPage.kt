@@ -95,7 +95,7 @@ fun ActivityPageScreen(
             RectBgButton(
                 onClick = {
                     viewModel.activityLevel = selectedActivity
-                    navController.navigate("pageGoal")
+                    navController.navigate("goalPage")
                 },
                 buttonText = "Continue",
                 modifier = Modifier
@@ -104,7 +104,7 @@ fun ActivityPageScreen(
                     .padding(bottom = 16.dp)
             )
             IconButton(
-                onClick = { navController.navigate("pageBirthday") },
+                onClick = { navController.navigate("birthdayPage") },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             ) {

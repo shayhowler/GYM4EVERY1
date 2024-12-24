@@ -1,5 +1,6 @@
 package com.gym4every1.auth
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -20,9 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -48,9 +47,14 @@ import java.security.MessageDigest
 import java.util.UUID
 
 @Composable
-fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
+fun GoogleSignInButton(
+    navController: NavController,
+    supabase: SupabaseClient,
+    context: Context,
+    onSignInStarted: () -> Unit = {},
+    onSignInCompleted: () -> Unit = {}
+) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     val onClick: () -> Unit = {
         val credentialManager = CredentialManager.create(context)
@@ -62,7 +66,7 @@ fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
             .joinToString("") { "%02x".format(it) }
 
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
+            .setFilterByAuthorizedAccounts(true)
             .setServerClientId(BuildConfig.GOOGLE_CLIENT_ID)
             .setNonce(hashedNonce)
             .build()
@@ -72,6 +76,7 @@ fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
             .build()
 
         coroutineScope.launch {
+            onSignInStarted() // Notify that sign-in has started
             try {
                 val result = credentialManager.getCredential(request = request, context = context)
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
@@ -87,35 +92,34 @@ fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
                 if (identities != null && identities.isNotEmpty()) {
                     val identityData = identities[0].identityData
                     val userId = supabase.auth.currentSessionOrNull()?.user?.id ?: return@launch
-                    val email = identityData["email"]?.toString()?.replace("\"", "") ?: "" // Remove double quotes from email
+                    val email = identityData["email"]?.toString()?.replace("\"", "") ?: ""
 
                     // Check if the user exists
-                    val existingUsers = supabase.from("users").select(columns = Columns.list("id, email, username"))
-                        .decodeList<User>() // Decode as a list of users
+                    val existingUsers = supabase.from("users")
+                        .select(columns = Columns.list("id, email, username"))
+                        .decodeList<User>()
 
                     val existingUser = existingUsers.firstOrNull { it.email == email }
 
                     if (existingUser != null) {
-                        // If username is null, redirect to SignUp1Activity
                         if (existingUser.username == null) {
                             navController.navigate("signUp1")
                         } else {
-                            // Check the profiles table for weight and redirect accordingly
                             val existingProfiles = supabase.from("profiles")
                                 .select(columns = Columns.list("id, username, weight, height, dateofbirth, activity_level, weight_goal"))
                                 .decodeList<Profile>()
 
                             val userProfile = existingProfiles.firstOrNull { it.username == existingUser.username }
 
-                            // If weight data exists, go to FeedActivity
                             if (userProfile?.weight != null) {
                                 navController.navigate("feedPage")
+                                Toast.makeText(context, "Sign-In Successful!", Toast.LENGTH_SHORT).show()
                             } else {
                                 navController.navigate("getStarted")
+                                Toast.makeText(context, "You must configure your profile first!", Toast.LENGTH_SHORT).show()
                             }
                         }
                     } else {
-                        // Insert default data for new user
                         supabase.from("users").insert(
                             mapOf(
                                 "id" to userId,
@@ -127,10 +131,8 @@ fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
                             )
                         )
                         navController.navigate("signUp1")
+                        Toast.makeText(context, "Success! Now you should setup your account", Toast.LENGTH_SHORT).show()
                     }
-
-                    Toast.makeText(context, "Sign-In Successful!", Toast.LENGTH_SHORT).show()
-
                 } else {
                     Toast.makeText(context, "No identities found.", Toast.LENGTH_SHORT).show()
                 }
@@ -138,6 +140,8 @@ fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
             } catch (e: Exception) {
                 Toast.makeText(context, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 Log.d("Error:", "${e.localizedMessage}")
+            } finally {
+                onSignInCompleted() // Notify that sign-in is completed
             }
         }
     }
@@ -168,7 +172,7 @@ fun GoogleSignInButton(navController: NavController, supabase: SupabaseClient) {
                     modifier = Modifier.size(24.dp).padding(end = 8.dp)
                 )
                 Text(
-                    text = stringResource(R.string.sign_in_with_google),
+                    text = "Sign in with Google",
                     color = Color.Black,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,

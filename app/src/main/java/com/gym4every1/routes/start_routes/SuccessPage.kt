@@ -1,6 +1,7 @@
 package com.gym4every1.routes.start_routes
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,10 @@ fun SuccessPageScreen(
     supabaseClient: SupabaseClient,
     profileViewModel: ProfileViewModel
 ) {
+    val context = LocalContext.current
+    BackHandler {
+        Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
+    }
     var animationCompleted by remember { mutableStateOf(false) }
 
     // Animate the scale factor of the icon
@@ -45,8 +50,6 @@ fun SuccessPageScreen(
         targetValue = if (animationCompleted) 10f else 0f, // Scale from 0 to 10
         animationSpec = tween(durationMillis = 1500) // Animation duration
     )
-
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         try {

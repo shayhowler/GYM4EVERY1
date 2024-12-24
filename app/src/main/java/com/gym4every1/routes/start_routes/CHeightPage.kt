@@ -144,7 +144,7 @@ fun HeightPageScreen(
         // Continue Button Section
         RectBgButton(
             onClick = {
-                navController.navigate("pageBirthday")
+                navController.navigate("birthdayPage")
             },
             buttonText = "Continue",
             modifier = Modifier
@@ -152,7 +152,7 @@ fun HeightPageScreen(
                 .padding(16.dp)
                 .height(60.dp)
         )
-        IconButton(onClick = { navController.navigate("pageWeight") }) {
+        IconButton(onClick = { navController.navigate("weightPage") }) {
             FaIcon(
                 FaIcons.ArrowLeft, // Using the ArrowLeft icon for back
                 modifier = Modifier.size(30.dp)

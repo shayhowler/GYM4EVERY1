@@ -1,5 +1,7 @@
 package com.gym4every1.routes.start_routes
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +22,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -33,8 +36,14 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun WeightPageScreen(
-    navController: NavController, viewModel: ProfileViewModel
+    navController: NavController, viewModel: ProfileViewModel, isGoogleAuth: Boolean
 ) {
+    val context = LocalContext.current
+    if (isGoogleAuth) {
+        BackHandler {
+            Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
+        }
+    }
     // Define the weight range and initial value.
     val minWeight = 30 // Minimum weight in kg.
     val maxWeight = 230 // Maximum weight in kg.

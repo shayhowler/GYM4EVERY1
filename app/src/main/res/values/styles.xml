@@ -1,9 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="step_into_y">
-        <item name="android:textSize">36sp</item>
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:lineSpacingExtra">8sp</item>
-        <item name="android:fontFamily">@font/nico_moji</item>
-    </style>
 </resources>

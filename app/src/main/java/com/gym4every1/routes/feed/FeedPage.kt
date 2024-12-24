@@ -1,5 +1,7 @@
 package com.gym4every1.routes.feed
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,14 @@ fun FeedPageScreen(
     navController: NavController,
     supabaseClient: SupabaseClient
 ) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    // Handle back button press to move the app to the background
+    BackHandler {
+        activity?.moveTaskToBack(true) // Moves the app to the background
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -71,17 +82,17 @@ fun FeedPageScreen(
 fun FeedContent(modifier: Modifier = Modifier) {
     val feedItems = listOf(
         FeedItem(
-            userName = "John Doe",
+            username = "John Doe",
             description = "Just completed a 5k run today! Feeling great 💪",
             imageUrl = "https://images.pexels.com/photos/936094/pexels-photo-936094.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
         ),
         FeedItem(
-            userName = "Jamey Smith",
+            username = "Jamey Smith",
             description = "Loving this yoga session at the park 🌿🧘‍♀️",
             imageUrl = "https://images.pexels.com/photos/6787357/pexels-photo-6787357.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
         ),
         FeedItem(
-            userName = "David Brown",
+            username = "David Brown",
             description = "Hit a new personal best on the bench press today! 🏋️‍♂️",
             imageUrl = "https://images.pexels.com/photos/3490363/pexels-photo-3490363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
         )
@@ -108,7 +119,7 @@ fun FeedCard(feedItem: FeedItem) {
         Column(modifier = Modifier.padding(16.dp)) {
             // User name
             Text(
-                text = feedItem.userName,
+                text = feedItem.username,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color.Black
@@ -138,7 +149,7 @@ fun FeedCard(feedItem: FeedItem) {
     }
 }
 data class FeedItem(
-    val userName: String,
+    val username: String,
     val description: String,
     val imageUrl: String
 )

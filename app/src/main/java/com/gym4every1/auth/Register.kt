@@ -42,10 +42,9 @@ suspend fun registerUser(
 
         // Step 4: Update the password if the user exists
         val isUserUpdated = if (existingUser != null) {
-            val updatedUser = supabaseClient.auth.updateUser {
+            supabaseClient.auth.updateUser {
                 password = userPassword
             }
-            println("Password updated successfully: $updatedUser")
             true // Indicating the user was updated
         } else {
             false // User is new, so no update is needed

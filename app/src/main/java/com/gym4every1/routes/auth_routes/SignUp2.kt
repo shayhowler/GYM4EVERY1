@@ -46,6 +46,7 @@ fun SignUp2Screen(
     navController: NavController,
     supabaseClient: SupabaseClient,
     viewModel: SignUpViewModel,
+    isGoogleAuth: Boolean
 ) {
     val context = LocalContext.current
     Box(
@@ -151,7 +152,7 @@ fun SignUp2Screen(
 
                                 if (isUserUpdated) {
                                     // If the user existed, navigate to "Get Started" page
-                                    Toast.makeText(context, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "You must configure your profile now!", Toast.LENGTH_SHORT).show()
                                     navController.navigate("getStarted") // Navigate to "get_started" page
                                 } else {
                                     // If the user is new, navigate to auth home
@@ -173,31 +174,31 @@ fun SignUp2Screen(
                 buttonText = "Sign Up",
                 modifier = Modifier.width(327.dp).height(60.dp)
             )
+            if (!isGoogleAuth) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(top = 0.dp, bottom = 14.dp)
+                ) {
+                    Text("Already have an account?", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "Sign In",
+                        color = Color(0xFFED4747),
+                        fontSize = 16.sp,
+                        modifier = Modifier.clickable {
+                            navController.navigate("signIn")
+                        }
+                    )
+                }
 
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(top = 0.dp, bottom = 14.dp)
-            ) {
-                Text("Already have an account?", fontSize = 16.sp)
-                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    "Sign In",
+                    text = "Back to Menu",
+                    textAlign = TextAlign.Center,
                     color = Color(0xFFED4747),
                     fontSize = 16.sp,
-                    modifier = Modifier.clickable {
-                        navController.navigate("signIn")
-                    }
+                    modifier = Modifier.clickable { navController.navigate("authHome") }
                 )
             }
-
-            Text(
-                text = "Back to Menu",
-                textAlign = TextAlign.Center,
-                color = Color(0xFFED4747),
-                fontSize = 16.sp,
-                modifier = Modifier.clickable { navController.navigate("authHome") }
-            )
-
             IconButton(onClick = { navController.navigate("signUp1") }) {
                 FaIcon(
                     FaIcons.ArrowLeft, // Using the ArrowLeft icon for back

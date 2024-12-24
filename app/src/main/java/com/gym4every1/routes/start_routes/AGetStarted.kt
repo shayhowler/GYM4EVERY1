@@ -1,5 +1,7 @@
 package com.gym4every1.routes.start_routes
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -28,13 +31,24 @@ import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
 import com.gym4every1.singletons.ProfileViewModel
 import com.gym4every1.singletons.SignUpViewModel
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
 
 @Composable
 fun GetStartedScreen(
     navController: NavController,
+    supabaseClient: SupabaseClient,
     signUpViewModel: SignUpViewModel,
     profileViewModel: ProfileViewModel,
 ) {
+    val context = LocalContext.current
+    val currentSession = supabaseClient.auth.currentSessionOrNull()
+    val isGoogleAuth = currentSession?.user?.email?.isNotEmpty() == true // Assuming Google login provides an email
+    if (isGoogleAuth) {
+        BackHandler {
+            Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
+        }
+    }
     LaunchedEffect(Unit) {
         signUpViewModel.clear()
         profileViewModel.clear()
@@ -75,7 +89,7 @@ fun GetStartedScreen(
             Spacer(modifier = Modifier.height(10.dp))
             RectBgButton(
                 onClick = {
-                    navController.navigate("weightPage")
+                    navController.navigate("weightPage/${isGoogleAuth}")
                 },
                 buttonText = "Get Started",
                 modifier = Modifier
