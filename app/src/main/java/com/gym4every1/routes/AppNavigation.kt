@@ -43,15 +43,14 @@ fun AppNavigation(
         }
         composable("getStarted") {
             if (SessionManager.isAuthenticated(context)) {
-                GetStartedScreen(navController, supabaseClient, signUpViewModel, profileViewModel)
+                GetStartedScreen(navController, signUpViewModel, profileViewModel)
             } else {
                 navController.navigate("authHome")
             }
         }
-        composable("weightPage/{isGoogleAuth}") { backStackEntry ->
-            val isGoogleAuth = backStackEntry.arguments?.getString("isGoogleAuth")?.toBoolean() == true
+        composable("weightPage") { backStackEntry ->
             if (SessionManager.isAuthenticated(context)) {
-                WeightPageScreen(navController, profileViewModel, isGoogleAuth)
+                WeightPageScreen(navController, profileViewModel)
             } else {
                 navController.navigate("authHome")
             }

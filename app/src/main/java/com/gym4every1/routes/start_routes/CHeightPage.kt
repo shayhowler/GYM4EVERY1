@@ -1,5 +1,7 @@
 package com.gym4every1.routes.start_routes
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -39,9 +42,13 @@ import kotlinx.coroutines.flow.collectLatest
 fun HeightPageScreen(
     navController: NavController, viewModel: ProfileViewModel
 ) {
-    // Define the height range and initial value.
-    val minHeight = 140 // Minimum height in cm.
-    val maxHeight = 230 // Maximum height in cm.
+    val context = LocalContext.current
+    BackHandler {
+        Toast.makeText(context, "Please use navigation buttons instead!", Toast.LENGTH_SHORT).show()
+    }
+
+    val minHeight = 140
+    val maxHeight = 230
     val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = viewModel.userHeight - minHeight)
 
     Column(

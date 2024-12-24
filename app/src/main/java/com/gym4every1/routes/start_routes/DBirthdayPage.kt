@@ -1,6 +1,8 @@
 package com.gym4every1.routes.start_routes
 
 import android.app.DatePickerDialog
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,7 +48,11 @@ fun BirthdayPageScreen(
     viewModel: ProfileViewModel
 ) {
     var selectedDate by remember { mutableStateOf(viewModel.userDateOfBirth ?: LocalDate.now()) }
+
     val context = LocalContext.current
+    BackHandler {
+        Toast.makeText(context, "Please use navigation buttons instead!", Toast.LENGTH_SHORT).show()
+    }
 
     Column(
         modifier = Modifier

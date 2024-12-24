@@ -1,5 +1,7 @@
 package com.gym4every1.routes.start_routes
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -43,6 +46,11 @@ fun ActivityPageScreen(
     navController: NavController, viewModel: ProfileViewModel
 ) {
     var selectedActivity by remember { mutableIntStateOf(1) }
+
+    val context = LocalContext.current
+    BackHandler {
+        Toast.makeText(context, "Please use navigation buttons instead!", Toast.LENGTH_SHORT).show()
+    }
 
     Box(
         modifier = Modifier

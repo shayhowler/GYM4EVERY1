@@ -31,24 +31,18 @@ import com.gym4every1.R
 import com.gym4every1.routes.shared.RectBgButton
 import com.gym4every1.singletons.ProfileViewModel
 import com.gym4every1.singletons.SignUpViewModel
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
 
 @Composable
 fun GetStartedScreen(
     navController: NavController,
-    supabaseClient: SupabaseClient,
     signUpViewModel: SignUpViewModel,
     profileViewModel: ProfileViewModel,
 ) {
     val context = LocalContext.current
-    val currentSession = supabaseClient.auth.currentSessionOrNull()
-    val isGoogleAuth = currentSession?.user?.email?.isNotEmpty() == true // Assuming Google login provides an email
-    if (isGoogleAuth) {
-        BackHandler {
-            Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
-        }
+    BackHandler {
+        Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
     }
+
     LaunchedEffect(Unit) {
         signUpViewModel.clear()
         profileViewModel.clear()
@@ -89,7 +83,7 @@ fun GetStartedScreen(
             Spacer(modifier = Modifier.height(10.dp))
             RectBgButton(
                 onClick = {
-                    navController.navigate("weightPage/${isGoogleAuth}")
+                    navController.navigate("weightPage")
                 },
                 buttonText = "Get Started",
                 modifier = Modifier

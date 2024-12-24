@@ -36,17 +36,15 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun WeightPageScreen(
-    navController: NavController, viewModel: ProfileViewModel, isGoogleAuth: Boolean
+    navController: NavController, viewModel: ProfileViewModel
 ) {
     val context = LocalContext.current
-    if (isGoogleAuth) {
-        BackHandler {
-            Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
-        }
+    BackHandler {
+        Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
     }
-    // Define the weight range and initial value.
-    val minWeight = 30 // Minimum weight in kg.
-    val maxWeight = 230 // Maximum weight in kg.
+
+    val minWeight = 30
+    val maxWeight = 230
     val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = viewModel.userWeight - minWeight)
 
     Column(
