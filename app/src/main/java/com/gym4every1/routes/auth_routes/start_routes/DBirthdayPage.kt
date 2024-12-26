@@ -1,4 +1,4 @@
-package com.gym4every1.routes.start_routes
+package com.gym4every1.routes.auth_routes.start_routes
 
 import android.app.DatePickerDialog
 import android.widget.Toast
@@ -37,7 +37,7 @@ import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
-import com.gym4every1.routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
 import com.gym4every1.singletons.ProfileViewModel
 import java.time.LocalDate
 import java.util.Calendar

@@ -1,4 +1,4 @@
-package com.gym4every1.routes.auth_routes
+package com.gym4every1.routes.auth_routes.main_routes
 
 import android.content.Context
 import android.text.TextUtils.isEmpty
@@ -42,10 +42,10 @@ import com.gym4every1.R
 import com.gym4every1.auth.loginUser
 import com.gym4every1.models.auth_models.Profile
 import com.gym4every1.models.auth_models.User
-import com.gym4every1.routes.shared.CustomTextFieldWithIcon
-import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.isValidEmail
-import com.gym4every1.routes.shared.validateFields
+import com.gym4every1.routes.auth_routes.shared.CustomTextFieldWithIcon
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.isValidEmail
+import com.gym4every1.routes.auth_routes.shared.validateFields
 import com.gym4every1.singletons.SignUpViewModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
@@ -194,9 +194,9 @@ fun SignInScreen(
                                             .decodeList<Profile>()
                                         val userProfile = existingProfiles.firstOrNull { it.username == existingUser.username }
 
-                                        // If weight data exists, navigate to FeedPageActivity
+                                        // If weight data exists, navigate to FeedPage through transition page
                                         if (userProfile?.weight != null) {
-                                            navController.navigate("feedPage") // Use onNavigate for redirection
+                                            navController.navigate("transitionPage1") // Use onNavigate for redirection
                                         } else {
                                             // Otherwise, navigate to GetStartedActivity
                                             navController.navigate("getStarted") // Use onNavigate for redirection

@@ -1,28 +1,28 @@
 package com.gym4every1
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.gym4every1.routes.AppNavigation
+import com.gym4every1.routes.navigation_handling.FirstNavigation
 import com.gym4every1.singletons.ProfileViewModel
 import com.gym4every1.singletons.SessionManager
 import com.gym4every1.singletons.SignUpViewModel
 import com.gym4every1.singletons.SupabaseClientManager
 
-class MainActivity : ComponentActivity() {
+class AuthActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
+        // Install splash screen and set exit animation
         installSplashScreen().apply {
             setOnExitAnimationListener { screen ->
                 val zoomX = ObjectAnimator.ofFloat(
@@ -33,7 +33,10 @@ class MainActivity : ComponentActivity() {
                 )
                 zoomX.interpolator = OvershootInterpolator()
                 zoomX.duration = 1000L
-                zoomX.doOnEnd { screen.remove() }
+                zoomX.doOnEnd {
+                    // Once animation is finished, check for authentication and proceed
+                    screen.remove()
+                }
 
                 val zoomY = ObjectAnimator.ofFloat(
                     screen.iconView,
@@ -43,40 +46,31 @@ class MainActivity : ComponentActivity() {
                 )
                 zoomY.interpolator = OvershootInterpolator()
                 zoomY.duration = 1000L
-                zoomY.doOnEnd { screen.remove() }
-
-                zoomX.start()
                 zoomY.start()
+                zoomX.start()
             }
         }
-
-        super.onCreate(savedInstanceState)
 
         val supabaseClient = SupabaseClientManager.getSupabaseClient()
         val signUpViewModel = SignUpViewModel
         val profileViewModel = ProfileViewModel
 
+        // Start listening for auth state changes immediately, but don't display UI yet
         setContent {
-            val navController = rememberNavController()
             val context = LocalContext.current
-            val startDestination = remember { getStartDestination(context) }
-
-            // Start listening to auth changes
+            // Only show the UI once auth state is checked
             LaunchedEffect(Unit) {
                 SessionManager.listenForAuthChanges(context, supabaseClient)
             }
 
-            AppNavigation(navController, supabaseClient, context,
-                signUpViewModel, profileViewModel, startDestination)
-
-        }
-    }
-
-    private fun getStartDestination(context: Context): String {
-        return if (SessionManager.isAuthenticated(context)) {
-            "feedPage"
-        } else {
-            "authHome"
+            // Show UI after splash screen animation ends (authentication check has passed)
+            FirstNavigation(
+                navController = rememberNavController(),
+                supabaseClient = supabaseClient,
+                context = context,
+                signUpViewModel = signUpViewModel,
+                profileViewModel = profileViewModel
+            )
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.gym4every1.routes.auth_routes
+package com.gym4every1.routes.auth_routes.main_routes
 
 import android.content.Context
 import android.widget.Toast
@@ -23,9 +23,9 @@ import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.auth.sendPasswordResetEmail
-import com.gym4every1.routes.shared.CustomTextFieldWithIcon
-import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.isValidEmail
+import com.gym4every1.routes.auth_routes.shared.CustomTextFieldWithIcon
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.isValidEmail
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,13 +34,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun PasswordResetScreen(navController: NavController, supabaseClient: SupabaseClient, context: Context) {
     val email = remember { mutableStateOf("") }
+    val answer = remember { mutableStateOf("") }
 
-    val onEmailSubmitted: (String) -> Unit = { userEmail ->
+
+    val onEmailSubmitted: (String) -> Unit = { userEmail  ->
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 sendPasswordResetEmail(
                     supabaseClient = supabaseClient,
                     userEmail = userEmail,
+                    securityAnswer = answer.value,
                     onSuccess = {
                         Toast.makeText(context, "Password reset email sent!", Toast.LENGTH_SHORT).show()
                         navController.navigate("authHome") // Navigate to auth home after success
@@ -94,7 +97,34 @@ fun PasswordResetScreen(navController: NavController, supabaseClient: SupabaseCl
                             .offset(y = 12.dp)
                             .size(40.dp)
                             .padding(start = 22.dp),
-                        tint = if (isValidEmail(email.value)) Color(0xFFED4747) else Color(0xFFD32F2F)
+                        tint = if (isValidEmail(email.value)) Color(0xFFED4747) else Color.Red
+                    )
+                },
+                modifier = Modifier.width(350.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Enter the answer of your security question.",
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(R.font.lato_black)),
+                color = Color(0xFFED4747),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+            CustomTextFieldWithIcon(
+                value = answer.value,
+                onValueChange = { answer.value = it },
+                placeholder = "Answer",
+                icon = {
+                    FaIcon(
+                        FaIcons.Key,
+                        modifier = Modifier
+                            .offset(y = 12.dp)
+                            .size(40.dp)
+                            .padding(start = 25.dp),
+                        tint = if (answer.value.isEmpty()) Color.Red else Color(0xFFED4747)
                     )
                 },
                 modifier = Modifier.width(350.dp)
@@ -110,7 +140,14 @@ fun PasswordResetScreen(navController: NavController, supabaseClient: SupabaseCl
                     } else {
                         Toast.makeText(
                             context,
-                            "Please enter a valid email address.",
+                            "Please enter a valid email address!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (answer.value.isEmpty()){
+                        Toast.makeText(
+                            context,
+                            "Answer can't be empty!",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

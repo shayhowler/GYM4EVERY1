@@ -1,11 +1,10 @@
-package com.gym4every1.routes.feed
+package com.gym4every1.routes.app_routes.profile
 
-import android.app.Activity
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.rememberAsyncImagePainter
 import com.gym4every1.auth.logoutUser
-import com.gym4every1.routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,22 +34,16 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun FeedPageScreen(
+fun ProfileScreen(
     navController: NavController,
-    supabaseClient: SupabaseClient
+    supabaseClient: SupabaseClient,
+    paddingValues: PaddingValues
 ) {
-    val context = LocalContext.current
-    val activity = context as? Activity
-
-    // Handle back button press to move the app to the background
-    BackHandler {
-        activity?.moveTaskToBack(true) // Moves the app to the background
-    }
-    
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .padding(paddingValues)
     ) {
         // Feed Content
         FeedContent(
@@ -59,14 +51,13 @@ fun FeedPageScreen(
                 .fillMaxSize()
                 .padding(bottom = 80.dp) // Reserve space for the logout button
         )
-
         // Logout Button
         RectBgButton(
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
                     logoutUser(supabaseClient)
                 }
-                navController.navigate("authHome")
+                navController.navigate("transitionPage2")
             },
             buttonText = "Log Out",
             modifier = Modifier

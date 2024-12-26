@@ -66,7 +66,7 @@ fun GoogleSignInButton(
             .joinToString("") { "%02x".format(it) }
 
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(true)
+            .setFilterByAuthorizedAccounts(false)
             .setServerClientId(BuildConfig.GOOGLE_CLIENT_ID)
             .setNonce(hashedNonce)
             .build()
@@ -112,7 +112,7 @@ fun GoogleSignInButton(
                             val userProfile = existingProfiles.firstOrNull { it.username == existingUser.username }
 
                             if (userProfile?.weight != null) {
-                                navController.navigate("feedPage")
+                                navController.navigate("transitionPage1")
                                 Toast.makeText(context, "Sign-In Successful!", Toast.LENGTH_SHORT).show()
                             } else {
                                 navController.navigate("getStarted")

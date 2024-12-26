@@ -1,4 +1,4 @@
-package com.gym4every1.routes.start_routes
+package com.gym4every1.routes.auth_routes.start_routes
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gym4every1.R
-import com.gym4every1.routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
 import com.gym4every1.singletons.ProfileViewModel
 import com.gym4every1.singletons.SignUpViewModel
 

@@ -1,4 +1,4 @@
-package com.gym4every1.routes.auth_routes
+package com.gym4every1.routes.auth_routes.main_routes
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gym4every1.R
 import com.gym4every1.auth.GoogleSignInButton
-import com.gym4every1.routes.shared.SignInButton
-import com.gym4every1.routes.shared.SignUpButton
+import com.gym4every1.routes.auth_routes.shared.SignInButton
+import com.gym4every1.routes.auth_routes.shared.SignUpButton
 import com.gym4every1.singletons.SignUpViewModel
 import io.github.jan.supabase.SupabaseClient
 

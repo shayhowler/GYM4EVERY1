@@ -1,4 +1,4 @@
-package com.gym4every1.routes.start_routes
+package com.gym4every1.routes.auth_routes.start_routes
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler

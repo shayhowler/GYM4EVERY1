@@ -1,4 +1,4 @@
-package com.gym4every1.routes.auth_routes
+package com.gym4every1.routes.auth_routes.main_routes
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -24,6 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,8 +34,8 @@ import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.auth.registerUser
-import com.gym4every1.routes.shared.CustomTextFieldWithIcon
-import com.gym4every1.routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.CustomTextFieldWithIcon
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
 import com.gym4every1.singletons.SignUpViewModel
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.CoroutineScope
@@ -68,6 +70,15 @@ fun SignUp2Screen(
                 .align(Alignment.TopCenter)
                 .padding(top = (LocalConfiguration.current.screenHeightDp * 0.4).dp)
         ) {
+            Text(
+                text = "Essential for password reset so be careful",
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(R.font.lato_black)),
+                color = Color(0xFFED4747),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
             CustomTextFieldWithIcon(
                 value = viewModel.securityQuestion,
                 onValueChange = { viewModel.securityQuestion = it },

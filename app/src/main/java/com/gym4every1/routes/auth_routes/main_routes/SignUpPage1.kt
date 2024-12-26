@@ -1,4 +1,4 @@
-package com.gym4every1.routes.auth_routes
+package com.gym4every1.routes.auth_routes.main_routes
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -21,9 +21,9 @@ import androidx.navigation.NavController
 import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
-import com.gym4every1.routes.shared.CustomTextFieldWithIcon
-import com.gym4every1.routes.shared.RectBgButton
-import com.gym4every1.routes.shared.isValidEmail
+import com.gym4every1.routes.auth_routes.shared.CustomTextFieldWithIcon
+import com.gym4every1.routes.auth_routes.shared.RectBgButton
+import com.gym4every1.routes.auth_routes.shared.isValidEmail
 import com.gym4every1.singletons.SignUpViewModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth

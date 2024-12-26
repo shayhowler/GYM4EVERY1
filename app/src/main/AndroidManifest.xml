@@ -14,7 +14,7 @@
         android:enableOnBackInvokedCallback="true">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Splash">
             <intent-filter>
@@ -22,6 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".AppActivity"
+            android:exported="true"
+            android:theme="@style/Theme.GYM4EVERY1"/>
     </application>
 </manifest>

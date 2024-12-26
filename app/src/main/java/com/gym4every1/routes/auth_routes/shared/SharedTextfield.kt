@@ -1,4 +1,4 @@
-package com.gym4every1.routes.shared
+package com.gym4every1.routes.auth_routes.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
