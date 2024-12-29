@@ -21,7 +21,7 @@ fun authRoutesNav(
     signUpViewModel: SignUpViewModel
 ) {
     builder.apply {
-        composable("transitionPage1") { TransitionScreen1(navController, context) }
+        composable("transitionPage1") { TransitionScreen1(navController, supabaseClient, context) }
         composable("authHome") { AuthHomeScreen(navController, supabaseClient, signUpViewModel) }
         composable("forgotPassword") { PasswordResetScreen(navController, supabaseClient, context) }
         composable("signIn") { SignInScreen(navController, supabaseClient, context, signUpViewModel) }

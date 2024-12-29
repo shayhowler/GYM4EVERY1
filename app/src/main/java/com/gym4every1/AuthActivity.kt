@@ -62,7 +62,6 @@ class AuthActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 SessionManager.listenForAuthChanges(context, supabaseClient)
             }
-
             // Show UI after splash screen animation ends (authentication check has passed)
             FirstNavigation(
                 navController = rememberNavController(),

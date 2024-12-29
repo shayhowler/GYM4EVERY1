@@ -3,7 +3,6 @@ package com.gym4every1.routes.transition_routes
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,16 +30,13 @@ fun TransitionScreen2(navController: NavController, context: Context) {
 
     // Simulate transition delay
     LaunchedEffect(Unit) {
-        // Wait for a few seconds (you can adjust this delay)
+        // Wait for a few seconds
         delay(1500)
-
-        // After the delay, check if the user is authenticated and navigate to the correct screen
         if (SessionManager.isAuthenticated(context)) {
             navController.navigate("feedPage")
         } else {
             val intent = Intent(context, AuthActivity::class.java)
             context.startActivity(intent)
-            (context as ComponentActivity).finish()
         }
     }
 

@@ -106,7 +106,7 @@ fun GoogleSignInButton(
                             navController.navigate("signUp1")
                         } else {
                             val existingProfiles = supabase.from("profiles")
-                                .select(columns = Columns.list("id, username, weight, height, dateofbirth, activity_level, weight_goal"))
+                                .select(columns = Columns.list("id, username, profile_picture_url, gender, weight, height, dateofbirth, activity_level, weight_goal"))
                                 .decodeList<Profile>()
 
                             val userProfile = existingProfiles.firstOrNull { it.username == existingUser.username }

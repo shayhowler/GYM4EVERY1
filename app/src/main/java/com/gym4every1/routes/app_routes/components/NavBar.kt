@@ -43,7 +43,7 @@ fun BottomNavigationBar(navController: NavController) {
             .fillMaxWidth()
             .background(
                 color = Color(0xFF192126),
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
             )
             .padding(horizontal = 40.dp, vertical = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,

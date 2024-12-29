@@ -83,7 +83,7 @@ fun GetStartedScreen(
             Spacer(modifier = Modifier.height(10.dp))
             RectBgButton(
                 onClick = {
-                    navController.navigate("weightPage")
+                    navController.navigate("selectionPage")
                 },
                 buttonText = "Get Started",
                 modifier = Modifier

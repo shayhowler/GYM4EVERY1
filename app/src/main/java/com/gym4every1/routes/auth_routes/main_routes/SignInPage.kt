@@ -40,17 +40,13 @@ import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.auth.loginUser
-import com.gym4every1.models.auth_models.Profile
-import com.gym4every1.models.auth_models.User
+import com.gym4every1.database.checkAndNavigate
 import com.gym4every1.routes.auth_routes.shared.CustomTextFieldWithIcon
 import com.gym4every1.routes.auth_routes.shared.RectBgButton
 import com.gym4every1.routes.auth_routes.shared.isValidEmail
 import com.gym4every1.routes.auth_routes.shared.validateFields
 import com.gym4every1.singletons.SignUpViewModel
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -177,37 +173,8 @@ fun SignInScreen(
                             isLoading = false
                             Toast.makeText(context, "Sign-In successful!", Toast.LENGTH_SHORT).show()
 
-                            val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id
-                            if (userId != null) {
-                                val existingUsers = supabaseClient.from("users").select(columns = Columns.list("id, email, username"))
-                                    .decodeList<User>()
-                                val existingUser = existingUsers.firstOrNull { it.email == email }
+                            checkAndNavigate(navController, supabaseClient, email, context)
 
-                                if (existingUser != null) {
-                                    // If username is null, navigate to SignUp1Activity
-                                    if (existingUser.username == null) {
-                                        navController.navigate("signUp1") // Use onNavigate for redirection
-                                    } else {
-                                        // Check the profiles table for weight and redirect accordingly
-                                        val existingProfiles = supabaseClient.from("profiles")
-                                            .select(columns = Columns.list("id, username, weight, height, dateofbirth, activity_level, weight_goal"))
-                                            .decodeList<Profile>()
-                                        val userProfile = existingProfiles.firstOrNull { it.username == existingUser.username }
-
-                                        // If weight data exists, navigate to FeedPage through transition page
-                                        if (userProfile?.weight != null) {
-                                            navController.navigate("transitionPage1") // Use onNavigate for redirection
-                                        } else {
-                                            // Otherwise, navigate to GetStartedActivity
-                                            navController.navigate("getStarted") // Use onNavigate for redirection
-                                        }
-                                    }
-                                } else {
-                                    // If the user doesn't exist in the "users" table, handle accordingly
-                                    errorMessage = "User not found"
-                                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-                                }
-                            }
                         } catch (e: Exception) {
                             isLoading = false
                             errorMessage = e.message ?: "Login failed"

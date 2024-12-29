@@ -74,6 +74,8 @@ fun SuccessPageScreen(
                 id = userId,
                 username = currentUser.username
                     ?: throw Exception("Username is null for the current user"),
+                profile_picture_url = ProfileViewModel.profilePictureUrl.toString(),
+                gender = ProfileViewModel.gender.toString(),
                 height = ProfileViewModel.userHeight.takeIf { it > 0 },
                 weight = ProfileViewModel.userWeight.takeIf { it > 0 },
                 dateofbirth = ProfileViewModel.userDateOfBirth?.format(dateFormatter), // Format to YYYY-MM-DD
@@ -108,13 +110,13 @@ fun SuccessPageScreen(
             modifier = Modifier
                 .scale(scale) // Apply scaling directly here
                 .align(Alignment.Center),
-            tint = Color.Green,
+            tint = Color(0xFF7CA623),
         )
     }
 
     LaunchedEffect(key1 = scale) {
         if (scale == 10f) { // When animation completes
-            navController.navigate("feedPage")
+            navController.navigate("transitionPage1")
         }
     }
 }

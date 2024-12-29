@@ -30,10 +30,10 @@ fun SecondNavigation(
     val currentRoute = currentBackStackEntry?.destination?.route
 
     Scaffold(
-        topBar = {
+         topBar = {
             // Display TopBar if current route is feedPage
             if (currentRoute == "feedPage") {
-                TopBar(true)
+                TopBar(supabaseClient, true)
             }
         },
         bottomBar = {
@@ -46,10 +46,10 @@ fun SecondNavigation(
             // NavHost for managing the navigation and screen transitions
             NavHost(
                 navController = navController,
-                startDestination = "feedPage"
+                startDestination = "transitionPage2"
             ) {
                 composable("transitionPage2") { TransitionScreen2(navController, context) }
-                composable("feedPage") { FeedScreen(paddingValues) }
+                composable("feedPage") { FeedScreen(supabaseClient, paddingValues) }
                 composable("explorePage") { ExploreScreen(paddingValues) }
                 composable("statsPage") { StatsScreen(paddingValues) }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }

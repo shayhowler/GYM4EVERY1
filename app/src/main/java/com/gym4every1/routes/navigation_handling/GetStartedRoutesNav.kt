@@ -8,6 +8,7 @@ import com.gym4every1.routes.auth_routes.start_routes.BirthdayPageScreen
 import com.gym4every1.routes.auth_routes.start_routes.GetStartedScreen
 import com.gym4every1.routes.auth_routes.start_routes.GoalPageScreen
 import com.gym4every1.routes.auth_routes.start_routes.HeightPageScreen
+import com.gym4every1.routes.auth_routes.start_routes.ProfilePictureAndGenderSelectionPage
 import com.gym4every1.routes.auth_routes.start_routes.SuccessPageScreen
 import com.gym4every1.routes.auth_routes.start_routes.WeightPageScreen
 import com.gym4every1.singletons.ProfileViewModel
@@ -23,6 +24,7 @@ fun getStartedRoutesNav(
 ) {
     builder.apply {
         composable("getStarted") { GetStartedScreen(navController, signUpViewModel, profileViewModel) }
+        composable("selectionPage") { ProfilePictureAndGenderSelectionPage(navController, supabaseClient) }
         composable("weightPage") { WeightPageScreen(navController, profileViewModel) }
         composable("heightPage") { HeightPageScreen(navController, profileViewModel) }
         composable("birthdayPage") { BirthdayPageScreen(navController, profileViewModel) }

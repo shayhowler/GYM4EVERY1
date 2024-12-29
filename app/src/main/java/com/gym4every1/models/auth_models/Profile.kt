@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 data class Profile(
     val id: String,
     val username: String,
+    val profile_picture_url: String? = null,
+    val gender: String?,
     val height: Int?,
     val weight: Int?,
     val dateofbirth: String?,
