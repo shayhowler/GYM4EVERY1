@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,33 +26,40 @@ fun SecondNavigation(
     supabaseClient: SupabaseClient,
     context: Context
 ) {
-    // Get the current route from the navigation back stack
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
-
-    // Determine the route name
     val currentRoute = currentBackStackEntry?.destination?.route
 
+    var showSavedVibes by remember { mutableStateOf(false) } // Track saved vibes visibility
+
     Scaffold(
-         topBar = {
-            // Display TopBar if current route is feedPage
+        topBar = {
             if (currentRoute == "feedPage") {
-                TopBar(supabaseClient, true)
+                TopBar(
+                    supabaseClient = supabaseClient,
+                    showSavedVibes = showSavedVibes,
+                    onShowSavedVibesChange = { newState -> showSavedVibes = newState },
+                    showDivider = true
+                )
             }
         },
         bottomBar = {
-            // Display BottomNavigationBar if current route is not transitionPage2
             if (currentRoute != "transitionPage2") {
                 BottomNavigationBar(navController)
             }
         },
         content = { paddingValues ->
-            // NavHost for managing the navigation and screen transitions
             NavHost(
                 navController = navController,
                 startDestination = "transitionPage2"
             ) {
                 composable("transitionPage2") { TransitionScreen2(navController, context) }
-                composable("feedPage") { FeedScreen(supabaseClient, paddingValues) }
+                composable("feedPage") {
+                    FeedScreen(
+                        supabaseClient = supabaseClient,
+                        paddingValues = paddingValues,
+                        showSavedVibes = showSavedVibes // Pass state here
+                    )
+                }
                 composable("explorePage") { ExploreScreen(paddingValues) }
                 composable("statsPage") { StatsScreen(paddingValues) }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }

@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gym4every1.database.fetchOwnerProfilePicture
 import com.gym4every1.models.social_models.FeedViewModel
@@ -30,67 +29,93 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(supabaseClient: SupabaseClient, paddingValues: PaddingValues, viewModel: FeedViewModel = viewModel()) {
+fun FeedScreen(
+    supabaseClient: SupabaseClient,
+    paddingValues: PaddingValues,
+    showSavedVibes: Boolean,
+    viewModel: FeedViewModel = viewModel()
+) {
     val context = LocalContext.current
     val activity = context as? Activity
 
     BackHandler {
-        activity?.moveTaskToBack(true) // Moves the app to the background
+        activity?.moveTaskToBack(true)
     }
 
-    // State for Pull Refresh and Coroutine Scope for refreshing data.
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Fetch posts when the screen is first displayed.
+    // Subscribe to real-time updates once the screen is loaded
     LaunchedEffect(Unit) {
-        viewModel.fetchPosts(supabaseClient)
+        viewModel.subscribeToVibesAndLikes()
     }
 
-    val posts = viewModel.posts
+    // Fetch vibes based on the showSavedVibes parameter
+    LaunchedEffect(showSavedVibes) {
+        viewModel.fetchVibes(supabaseClient, showSavedVibes)
+    }
+
+    val vibes = viewModel.vibes
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
             coroutineScope.launch {
                 isRefreshing = true
-                viewModel.fetchPosts(supabaseClient)
-                isRefreshing = false // Reset refreshing state after fetching data.
+                viewModel.fetchVibes(supabaseClient, showSavedVibes)
+                isRefreshing = false
             }
         },
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color.White)
-            .padding(paddingValues) // Ensure padding around the screen content
+            .padding(paddingValues)
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize() // Make sure LazyColumn fills the screen
-                .padding(horizontal = 5.dp) // No horizontal padding here
+                .fillMaxSize()
         ) {
-            items(posts) { post ->
-                // Fetch the profile picture URL for each post's user.
+            items(vibes) { vibe ->
                 var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
-                LaunchedEffect(post.user_id) { // Use user_id from post for fetching.
-                    val fetchedUrl = fetchOwnerProfilePicture(supabaseClient, post.user_id)
-                    profilePictureUrl = fetchedUrl // Store fetched URL.
+                LaunchedEffect(vibe.user_id) {
+                    val fetchedUrl = fetchOwnerProfilePicture(supabaseClient, vibe.user_id)
+                    profilePictureUrl = fetchedUrl
                 }
 
+                val isSaved = viewModel.isVibeSaved(vibe.id)
+                val isLiked = (vibe.like_count ?: 0) > 0 // Check if the vibe has likes
+
                 PostCard(
-                    profilePictureUrl = profilePictureUrl ?: "", // Use the fetched profile picture URL.
-                    username = post.username,
-                    content = post.content,
-                    mediaUrl = post.media_url,
-                    timestamp = post.created_at,
-                    onMediaClick = {
-                        // Handle media click.
-                    },
+                    profilePictureUrl = profilePictureUrl ?: "",
+                    username = vibe.username,
+                    content = vibe.content,
+                    mediaUrl = vibe.media_url,
+                    timestamp = vibe.created_at,
+                    isSaved = isSaved,
+                    isLiked,
+                    likeCount = vibe.like_count ?: 0,
+                    onMediaClick = { },
                     onLikeClick = {
-                        // Handle like click.
+                        coroutineScope.launch {
+                            if (isLiked) {
+                                viewModel.unlikeVibe(supabaseClient, vibe.id)
+                            } else {
+                                viewModel.likeVibe(supabaseClient, vibe.id)
+                            }
+                            viewModel.fetchVibes(supabaseClient, showSavedVibes) // Refresh vibes
+                        }
                     },
-                    onCommentClick = {
-                        // Handle comment click.
+                    onCommentClick = { },
+                    onSaveClick = {
+                        coroutineScope.launch {
+                            if (isSaved) {
+                                viewModel.unsaveVibe(supabaseClient, vibe.id)
+                            } else {
+                                viewModel.saveVibe(supabaseClient, vibe.id)
+                            }
+                            viewModel.fetchVibes(supabaseClient, showSavedVibes) // Refresh vibes
+                        }
                     }
                 )
             }
