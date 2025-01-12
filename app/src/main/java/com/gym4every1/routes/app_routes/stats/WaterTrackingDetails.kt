@@ -68,7 +68,6 @@ fun WaterTrackingPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display water tracking data
             waterData.forEach { item ->
                 Text(
                     text = "Date: ${item.date}, Intake: ${item.waterIntakeMl} ml",
