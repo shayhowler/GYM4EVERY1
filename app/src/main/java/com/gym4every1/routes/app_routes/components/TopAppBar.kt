@@ -55,7 +55,7 @@ import com.guru.fontawesomecomposelib.FaIcon
 import com.guru.fontawesomecomposelib.FaIcons
 import com.gym4every1.R
 import com.gym4every1.database.fetchProfilePicture
-import com.gym4every1.database.fetchUserProfile
+import com.gym4every1.database.fetchUsername
 import com.gym4every1.models.social_models.FeedViewModel
 import com.gym4every1.storage.uploadMedia
 import io.github.jan.supabase.SupabaseClient
@@ -92,7 +92,7 @@ fun TopBar(
 
     LaunchedEffect(supabaseClient) {
         coroutineScope.launch {
-            username = fetchUserProfile(supabaseClient, userId).toString()
+            username = fetchUsername(supabaseClient, userId).toString()
             profilePictureUrl = fetchProfilePicture(supabaseClient)
         }
     }
