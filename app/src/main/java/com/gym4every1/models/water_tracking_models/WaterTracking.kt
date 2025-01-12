@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WaterTracking(
     val id: String,
-    val userId: String,
+    val user_id: String,
     val username: String,
-    val date: String?,
-    val waterIntakeMl: Int,
-    val createdAt: String?,
-    val updatedAt: String?
+    val date: String, // Ensure this is formatted as "yyyy-MM-dd"
+    val water_intake_ml: Int,
+    val created_at: String?,
+    val updated_at: String?
 )

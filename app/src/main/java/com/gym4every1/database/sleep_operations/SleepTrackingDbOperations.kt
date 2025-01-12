@@ -6,37 +6,42 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
 
 suspend fun fetchSleepTrackingData(supabaseClient: SupabaseClient, userId: String): List<SleepTracking> {
-    return withContext(Dispatchers.IO) { // Using Dispatchers.IO to run the network request on the IO thread
+    return withContext(Dispatchers.IO) {
         try {
+            // Fetch data from Supabase
             val response = supabaseClient.from("sleep_tracking")
                 .select(columns = Columns.list("id, user_id, username, sleep_start, sleep_end, sleep_quality, created_at, updated_at"))
-                .decodeList<SleepTracking>() // Decoding all records from the table
+                .decodeList<SleepTracking>() // Decode into a list of SleepTracking models
 
-            // Filter the results based on the userId after decoding
-            response.filter { it.userId == userId } // Apply the filter on decoded results
+            // Filter by user ID after decoding
+            response.filter { it.user_id == userId }
         } catch (e: Exception) {
-            e.printStackTrace() // Print the exception for debugging
-            emptyList<SleepTracking>() // Return an empty list in case of error
+            e.printStackTrace()
+            emptyList() // Return an empty list if an error occurs
         }
     }
 }
 
 
 
+
 suspend fun insertSleepTrackingData(supabaseClient: SupabaseClient, sleepTracking: SleepTracking) {
     try {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         supabaseClient.from("sleep_tracking")
             .insert(
                 mapOf(
-                    "user_id" to sleepTracking.userId,
+                    "user_id" to sleepTracking.user_id,
                     "username" to sleepTracking.username,
-                    "sleep_start" to sleepTracking.sleepStart,
-                    "sleep_end" to sleepTracking.sleepEnd,
-                    "sleep_quality" to sleepTracking.sleepQuality,
-                    "created_at" to sleepTracking.createdAt,
-                    "updated_at" to sleepTracking.updatedAt
+                    "sleep_start" to sleepTracking.sleep_start,
+                    "sleep_end" to sleepTracking.sleep_end,
+                    "sleep_quality" to sleepTracking.sleep_quality,
+                    "created_at" to timestamp,
+                    "updated_at" to timestamp
                 )
             )
     } catch (e: Exception) {

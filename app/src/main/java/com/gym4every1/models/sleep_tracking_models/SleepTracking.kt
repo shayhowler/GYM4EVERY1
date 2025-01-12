@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SleepTracking(
     val id: String,
-    val userId: String,
+    val user_id: String,
     val username: String,
-    val sleepStart: String?,
-    val sleepEnd: String?,
-    val sleepQuality: String,
-    val createdAt: String?,
-    val updatedAt: String?
+    val sleep_start: String?,
+    val sleep_end: String?,
+    val sleep_quality: String,
+    val created_at: String?,
+    val updated_at: String?
 )
