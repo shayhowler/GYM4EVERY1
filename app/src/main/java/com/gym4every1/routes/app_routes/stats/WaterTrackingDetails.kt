@@ -22,6 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun WaterTrackingPage(
@@ -34,17 +36,18 @@ fun WaterTrackingPage(
     var waterData by remember { mutableStateOf<List<WaterTracking>>(emptyList()) }
     var showInsertDialog by remember { mutableStateOf(false) }
     var waterIntake by remember { mutableStateOf("") }
-    var selectedDate by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf(Date()) } // State to store selected date
     var errorMessage by remember { mutableStateOf("") }
 
     // Fetch user data and water tracking records
-    LaunchedEffect(Unit) {
+    LaunchedEffect(selectedDate) {
         val session = supabaseClient.auth.currentSessionOrNull()
         if (session != null) {
             userId = session.user?.id
             username = fetchUsername(supabaseClient, userId.toString())
             if (userId != null) {
-                waterData = fetchWaterTrackingData(supabaseClient, userId!!)
+                // Fetch water data based on the selected date
+                waterData = fetchWaterTrackingData(supabaseClient, userId!!, selectedDate)
             }
         }
     }
@@ -58,9 +61,12 @@ fun WaterTrackingPage(
         GlobalTrackingPage(
             title = "Water Tracking",
             themeColor = Color(0xFF80DEEA) // A calming light cyan color
-        ) {
+        ) { newSelectedDate ->
+            // Update the selected date in the WaterTrackingPage
+            selectedDate = newSelectedDate
+
             Text(
-                text = "Your water intake",
+                text = "Your water intake on ${SimpleDateFormat("MMMM dd, yyyy").format(selectedDate)}",
                 fontSize = 24.sp,
                 color = Color(0xFF81D4FA),
                 modifier = Modifier.padding(16.dp)
@@ -68,6 +74,7 @@ fun WaterTrackingPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Display the fetched water intake data for the selected date
             waterData.forEach { item ->
                 Text(
                     text = "Date: ${item.date}, Intake: ${item.waterIntakeMl} ml",
@@ -86,7 +93,7 @@ fun WaterTrackingPage(
         }
     }
 
-    // Insert water intake dialog
+// Insert water intake dialog
     if (showInsertDialog) {
         AlertDialog(
             onDismissRequest = { showInsertDialog = false },
@@ -98,17 +105,7 @@ fun WaterTrackingPage(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    // Input for date
-                    TextField(
-                        value = selectedDate,
-                        onValueChange = { selectedDate = it },
-                        label = { Text("Date (YYYY-MM-DD)") }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
-// Input for water intake
+                    // Input for water intake
                     TextField(
                         value = waterIntake,
                         onValueChange = { waterIntake = it },
@@ -119,18 +116,18 @@ fun WaterTrackingPage(
             },
             confirmButton = {
                 Button(onClick = {
-                    if (waterIntake.isNotEmpty() && selectedDate.isNotEmpty() && userId != null && username != null) {
+                    if (waterIntake.isNotEmpty() && userId != null && username != null) {
                         val waterTracking = WaterTracking(
                             userId = userId!!,
                             username = username!!,
-                            date = selectedDate,
+                            date = SimpleDateFormat("yyyy-MM-dd").format(selectedDate),
                             waterIntakeMl = waterIntake.toInt()
                         )
 
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
                                 insertWaterTrackingData(supabaseClient, waterTracking)
-                                waterData = fetchWaterTrackingData(supabaseClient, userId!!)
+                                waterData = fetchWaterTrackingData(supabaseClient, userId!!, selectedDate)
                                 withContext(Dispatchers.Main) {
                                     showInsertDialog = false
                                     errorMessage = ""

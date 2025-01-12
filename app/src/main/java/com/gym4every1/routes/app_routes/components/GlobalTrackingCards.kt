@@ -24,7 +24,7 @@ fun GlobalTrackingPage(
     content: @Composable (selectedDate: Date) -> Unit
 ) {
     val context = LocalContext.current
-    var selectedDate by remember { mutableStateOf(Date()) }
+    var selectedDate by remember { mutableStateOf(Date()) } // Track selected date state
     val calendar = Calendar.getInstance()
     calendar.time = selectedDate
 
@@ -87,7 +87,7 @@ fun GlobalTrackingPage(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Date Picker Row
+// Date Picker Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -149,12 +149,8 @@ fun GlobalTrackingPage(
                     color = themeColor
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                content(selectedDate) // Pass the selectedDate to the content
+                content(selectedDate)
             }
         }
     }
 }
-
-
-
-
