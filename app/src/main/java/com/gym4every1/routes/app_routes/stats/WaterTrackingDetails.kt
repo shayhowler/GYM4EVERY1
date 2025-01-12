@@ -91,9 +91,7 @@ fun WaterTrackingPage(
                 Text(text = "Add Water Intake")
             }
         }
-    }
-
-// Insert water intake dialog
+    }// Insert water intake dialog
     if (showInsertDialog) {
         AlertDialog(
             onDismissRequest = { showInsertDialog = false },

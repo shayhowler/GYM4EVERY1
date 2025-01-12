@@ -71,7 +71,7 @@ fun GlobalTrackingPage(
                         color = dayColor,
                         modifier = Modifier
                             .clickable {
-                                // Correct day setting logic for Sunday (7) and others
+                                    // Correct day setting logic for Sunday (7) and others
                                 if (index == 6) {
                                     // If Sunday is clicked, don't reset to Monday, keep it as Sunday
                                     calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
@@ -87,7 +87,7 @@ fun GlobalTrackingPage(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-// Date Picker Row
+            // Date Picker Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

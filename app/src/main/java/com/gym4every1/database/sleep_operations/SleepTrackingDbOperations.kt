@@ -8,26 +8,32 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
-suspend fun fetchSleepTrackingData(supabaseClient: SupabaseClient, userId: String): List<SleepTracking> {
+suspend fun fetchSleepTrackingData(supabaseClient: SupabaseClient, userId: String, selectedDate: Date): List<SleepTracking> {
     return withContext(Dispatchers.IO) {
         try {
-            // Fetch data from Supabase
+            // Format the selected date to match the database format (yyyy-MM-dd)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedSelectedDate = dateFormat.format(selectedDate)
+
+            // Fetch data from Supabase and filter by user ID and sleep_end date
             val response = supabaseClient.from("sleep_tracking")
                 .select(columns = Columns.list("id, user_id, username, sleep_start, sleep_end, sleep_quality, created_at, updated_at"))
                 .decodeList<SleepTracking>() // Decode into a list of SleepTracking models
 
-            // Filter by user ID after decoding
-            response.filter { it.user_id == userId }
+            // Filter by user ID and sleep_end matching the selected date
+            response.filter {
+                it.user_id == userId &&
+                        it.sleep_end != null &&
+                        it.sleep_end.substringBefore("T") == formattedSelectedDate // Compare only the date part of sleep_end
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList() // Return an empty list if an error occurs
         }
     }
 }
-
-
-
 
 suspend fun insertSleepTrackingData(supabaseClient: SupabaseClient, sleepTracking: SleepTracking) {
     try {

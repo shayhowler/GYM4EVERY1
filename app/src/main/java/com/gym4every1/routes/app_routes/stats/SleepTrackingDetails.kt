@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -24,8 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
-
 
 @Composable
 fun SleepTrackingPage(navController: NavController, supabaseClient: SupabaseClient, paddingValues: PaddingValues) {
@@ -36,21 +33,19 @@ fun SleepTrackingPage(navController: NavController, supabaseClient: SupabaseClie
     var sleepStart by remember { mutableStateOf("") }
     var sleepEnd by remember { mutableStateOf("") }
     var sleepQuality by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf(Date()) }
 
     // Fetch user session, username, and initial sleep data
-    LaunchedEffect(true) {
+    LaunchedEffect(selectedDate) {
         val session = supabaseClient.auth.currentSessionOrNull()
         if (session != null) {
             userId = session.user?.id
             username = fetchUsername(supabaseClient, userId!!)
             if (userId != null) {
-                sleepData = fetchSleepTrackingData(supabaseClient, userId!!)
+                sleepData = fetchSleepTrackingData(supabaseClient, userId!!, selectedDate)
             }
         }
     }
-
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val currentDateString = dateFormat.format(Date())
 
     Column(
         modifier = Modifier
@@ -61,36 +56,36 @@ fun SleepTrackingPage(navController: NavController, supabaseClient: SupabaseClie
         GlobalTrackingPage(
             title = "Sleep Tracking",
             themeColor = Color(0xFF80DEEA) // A calming light cyan color
-        ) {
+        ) { newSelectedDate ->
+            selectedDate = newSelectedDate
+
             Text(
-                text = "8 Hours Slept Today",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF00796B) // Dark teal for contrast
+                text = "Your sleep on ${SimpleDateFormat("MMMM dd, yyyy").format(selectedDate)}",
+                fontSize = 24.sp,
+                color = Color(0xFF81D4FA),
+                modifier = Modifier.padding(16.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display Sleep Data
+            // Display the fetched sleep data for the selected date
             sleepData.forEach { item ->
                 Text(
                     text = "Sleep Start: ${item.sleep_start}, Sleep End: ${item.sleep_end}, Quality: ${item.sleep_quality}",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Add Sleep Entry Button
-            Button(onClick = { showInsertDialog = true }) {
+            // Button to show the insert dialog
+            Button(onClick = { showInsertDialog = true }, modifier = Modifier.padding(16.dp)) {
                 Text(text = "Add Sleep Data")
             }
         }
-    }
-
-    // Sleep Tracking Dialog
+    }// Sleep Tracking Dialog
     if (showInsertDialog) {
         AlertDialog(
             onDismissRequest = { showInsertDialog = false },
@@ -101,7 +96,7 @@ fun SleepTrackingPage(navController: NavController, supabaseClient: SupabaseClie
                         value = sleepStart,
                         onValueChange = { sleepStart = it },
                         label = { Text("Sleep Start (YYYY-MM-DD HH:MM)") },
-                        placeholder = { Text(currentDateString) }
+                        placeholder = { Text(SimpleDateFormat("yyyy-MM-dd HH:mm").format(selectedDate)) }
                     )
 
                     TextField(
@@ -146,7 +141,8 @@ fun SleepTrackingPage(navController: NavController, supabaseClient: SupabaseClie
 
                             CoroutineScope(Dispatchers.IO).launch {
                                 insertSleepTrackingData(supabaseClient, sleepTracking)
-                                sleepData = fetchSleepTrackingData(supabaseClient, userId!!)
+                                // After saving, fetch updated data for selected date
+                                sleepData = fetchSleepTrackingData(supabaseClient, userId!!, selectedDate)
                             }
                             showInsertDialog = false
                         }
@@ -163,6 +159,3 @@ fun SleepTrackingPage(navController: NavController, supabaseClient: SupabaseClie
         )
     }
 }
-
-
-
