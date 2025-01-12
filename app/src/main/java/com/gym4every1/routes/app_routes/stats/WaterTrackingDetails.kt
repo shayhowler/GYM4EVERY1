@@ -1,28 +1,13 @@
 package com.gym4every1.routes.app_routes.stats
 
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -36,9 +21,14 @@ import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
-fun WaterTrackingPage(navController: NavController, supabaseClient: SupabaseClient, paddingValues: PaddingValues) {
+fun WaterTrackingPage(
+    navController: NavController,
+    supabaseClient: SupabaseClient,
+    paddingValues: PaddingValues
+) {
     var userId by remember { mutableStateOf<String?>(null) }
     var username by remember { mutableStateOf<String?>(null) }
     var waterData by remember { mutableStateOf<List<WaterTracking>>(emptyList()) }
@@ -47,12 +37,12 @@ fun WaterTrackingPage(navController: NavController, supabaseClient: SupabaseClie
     var selectedDate by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Fetch user session, username, and initial water tracking data
-    LaunchedEffect(true) {
+    // Fetch user data and water tracking records
+    LaunchedEffect(Unit) {
         val session = supabaseClient.auth.currentSessionOrNull()
         if (session != null) {
             userId = session.user?.id
-            username = userId?.let { fetchUsername(supabaseClient, it) }
+            username = fetchUsername(supabaseClient, userId.toString())
             if (userId != null) {
                 waterData = fetchWaterTrackingData(supabaseClient, userId!!)
             }
@@ -66,129 +56,104 @@ fun WaterTrackingPage(navController: NavController, supabaseClient: SupabaseClie
             .padding(paddingValues)
     ) {
         GlobalTrackingPage(
-            title = "Water Tracking",
-            themeColor = Color(0xFF81D4FA)
+            title = "Sleep Tracking",
+            themeColor = Color(0xFF80DEEA) // A calming light cyan color
         ) {
             Text(
-                text = "6/8 Cups Drunk Today",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Gray
+                text = "Water Tracking",
+                fontSize = 24.sp,
+                color = Color(0xFF81D4FA),
+                modifier = Modifier.padding(16.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display Water Tracking List
+            // Display water tracking data
             waterData.forEach { item ->
-                val formattedDate = item.date ?: "Unknown Date"
                 Text(
-                    text = "Date: $formattedDate, Intake: ${item.water_intake_ml} ml",
+                    text = "Date: ${item.date}, Intake: ${item.waterIntakeMl} ml",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Add Water Intake Button
-            Button(onClick = { showInsertDialog = true }) {
+            // Button to show the insert dialog
+            Button(onClick = { showInsertDialog = true }, modifier = Modifier.padding(16.dp)) {
                 Text(text = "Add Water Intake")
             }
         }
     }
 
-    // Water Intake Dialog
+    // Insert water intake dialog
     if (showInsertDialog) {
         AlertDialog(
             onDismissRequest = { showInsertDialog = false },
             title = { Text("Add Water Intake") },
             text = {
                 Column {
-                    // Error Message
                     if (errorMessage.isNotEmpty()) {
                         Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    // Date Input
+                    // Input for date
                     TextField(
                         value = selectedDate,
                         onValueChange = { selectedDate = it },
                         label = { Text("Date (YYYY-MM-DD)") }
                     )
 
-                    // Water Intake Input
+                    Spacer(modifier = Modifier.height(8.dp))
+
+
+// Input for water intake
                     TextField(
                         value = waterIntake,
                         onValueChange = { waterIntake = it },
-                        label = { Text("Water Intake (ml)") }
+                        label = { Text("Water Intake (ml)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        val parsedDate = parseDate(selectedDate)
-                        if (waterIntake.isNotEmpty() && parsedDate != null && userId != null && username != null) {
-                            try {
-                                val intake = waterIntake.toInt()
-                                if (intake <= 0) {
-                                    errorMessage = "Water intake must be a positive number"
-                                    return@Button
-                                }
-                                val waterTracking = WaterTracking(
-                                    id = "", // Handle ID generation in Supabase
-                                    user_id = userId!!,
-                                    username = username!!,
-                                    date = formatDate(parsedDate), // Format date before saving
-                                    water_intake_ml = intake,
-                                    created_at = null, // Supabase will auto-generate
-                                    updated_at = null // Supabase will auto-generate
-                                )
+                Button(onClick = {
+                    if (waterIntake.isNotEmpty() && selectedDate.isNotEmpty() && userId != null && username != null) {
+                        val waterTracking = WaterTracking(
+                            userId = userId!!,
+                            username = username!!,
+                            date = selectedDate,
+                            waterIntakeMl = waterIntake.toInt()
+                        )
 
-                                // Insert data and refresh list
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    insertWaterTrackingData(supabaseClient, waterTracking)
-                                    waterData = fetchWaterTrackingData(supabaseClient, userId!!)
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                insertWaterTrackingData(supabaseClient, waterTracking)
+                                waterData = fetchWaterTrackingData(supabaseClient, userId!!)
+                                withContext(Dispatchers.Main) {
+                                    showInsertDialog = false
+                                    errorMessage = ""
                                 }
-                                showInsertDialog = false
-                                errorMessage = ""
-                            } catch (e: NumberFormatException) {
-                                errorMessage = "Invalid water intake amount"
+                            } catch (e: Exception) {
+                                withContext(Dispatchers.Main) {
+                                    errorMessage = "Failed to add data: ${e.message}"
+                                }
                             }
-                        } else {
-                            errorMessage = "Please fill all fields with valid values"
                         }
+                    } else {
+                        errorMessage = "All fields must be filled correctly!"
                     }
-                ) {
+                }) {
                     Text("Save")
                 }
             },
             dismissButton = {
-                Button(onClick = {
-                    showInsertDialog = false
-                    errorMessage = ""
-                }) {
+                Button(onClick = { showInsertDialog = false }) {
                     Text("Cancel")
                 }
             }
         )
     }
-}
-
-// Utility function to parse a String into a Date
-fun parseDate(dateString: String): Date? {
-    return try {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        formatter.parse(dateString)
-    } catch (e: Exception) {
-        null
-    }
-}
-
-// Utility function to format a Date into a String
-fun formatDate(date: Date): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    return formatter.format(date)
 }
