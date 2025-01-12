@@ -56,11 +56,11 @@ fun WaterTrackingPage(
             .padding(paddingValues)
     ) {
         GlobalTrackingPage(
-            title = "Sleep Tracking",
+            title = "Water Tracking",
             themeColor = Color(0xFF80DEEA) // A calming light cyan color
         ) {
             Text(
-                text = "Water Tracking",
+                text = "Your water intake",
                 fontSize = 24.sp,
                 color = Color(0xFF81D4FA),
                 modifier = Modifier.padding(16.dp)
