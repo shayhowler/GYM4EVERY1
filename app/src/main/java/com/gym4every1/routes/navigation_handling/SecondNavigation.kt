@@ -16,6 +16,7 @@ import com.gym4every1.routes.app_routes.components.TopBar
 import com.gym4every1.routes.app_routes.explore.ExploreScreen
 import com.gym4every1.routes.app_routes.feed.FeedScreen
 import com.gym4every1.routes.app_routes.profile.ProfileScreen
+import com.gym4every1.routes.app_routes.stats.NutritionTrackingPage
 import com.gym4every1.routes.app_routes.stats.SleepTrackingPage
 import com.gym4every1.routes.app_routes.stats.StatsScreen
 import com.gym4every1.routes.app_routes.stats.WaterTrackingPage
@@ -66,6 +67,7 @@ fun SecondNavigation(
                 composable("statsPage") { StatsScreen(navController, supabaseClient, paddingValues) }
                 composable("detail/sleep") { SleepTrackingPage(navController, supabaseClient, paddingValues) }
                 composable("detail/water") { WaterTrackingPage(navController, supabaseClient, paddingValues) }
+                composable("detail/nutrition") { NutritionTrackingPage(navController, paddingValues) }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }
             }
         }
