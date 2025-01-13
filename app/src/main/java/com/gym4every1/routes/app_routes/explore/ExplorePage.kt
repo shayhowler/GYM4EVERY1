@@ -14,12 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ExploreScreen(paddingValues: PaddingValues) {
     val context = LocalContext.current
@@ -28,6 +25,7 @@ fun ExploreScreen(paddingValues: PaddingValues) {
     }
 
     val popularWorkouts = listOf("Cardio", "Hand Training", "Lower Body Training")
+    val otherWorkouts = listOf("Back Training", "Chest Training", "Belly Training")
     val exerciseGroups = (1..12).chunked(4) // Divide exercises into groups of 4
 
     Column(
@@ -46,27 +44,16 @@ fun ExploreScreen(paddingValues: PaddingValues) {
         )
 
         // Horizontal Pager for Popular Workouts
-        val workoutPagerState = rememberPagerState()
+        val workoutPagerState = rememberPagerState { popularWorkouts.size }
         HorizontalPager(
-            count = popularWorkouts.size,
             state = workoutPagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
+            modifier = Modifier.fillMaxWidth().height(150.dp) // Reduced height
         ) { page ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = when (page) {
-                        0 -> Color.Red
-                        1 -> Color.Blue
-                        else -> Color.Green
-                    }
-                ),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -74,103 +61,115 @@ fun ExploreScreen(paddingValues: PaddingValues) {
                 ) {
                     Text(
                         text = popularWorkouts[page],
-                        fontSize = 20.sp,
+                        fontSize = 18.sp, // Uniform font size
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.Black
                     )
                 }
             }
         }
+        Spacer(modifier = Modifier.height(8.dp)) // Space between rows
+        // Custom Pager Indicator for Popular Workouts
+        PagerIndicator(currentPageIndex = workoutPagerState.currentPage, pageCount = popularWorkouts.size)
 
-        HorizontalPagerIndicator(
-            pagerState = workoutPagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(8.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
+        val otherWorkoutPagerState = rememberPagerState { otherWorkouts.size }
+        HorizontalPager(
+            state = otherWorkoutPagerState,
+            modifier = Modifier.fillMaxWidth().height(150.dp) // Matching the Popular Workouts height
+        ) { page ->
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor= Color.LightGray),
+                shape= RoundedCornerShape(16.dp),
+                elevation= CardDefaults.cardElevation(defaultElevation= 8.dp)
+            ) {
+                Box(
+                    modifier= Modifier.fillMaxSize(),
+                    contentAlignment= Alignment.Center
+                ) {
+                    Text(
+                        text= otherWorkouts[page],
+                        fontSize= 18.sp, // Uniform font size
+                        fontWeight= FontWeight.Bold,
+                        color= Color.Black
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp)) // Space between rows
+        // Custom Pager Indicator for Other Workouts
+        PagerIndicator(currentPageIndex= otherWorkoutPagerState.currentPage, pageCount= otherWorkouts.size)
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier= Modifier.height(16.dp))
 
         // Title: Best for You
         Text(
-            text = "Best for You",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(16.dp)
+            text= "Best for You",
+            fontSize= 24.sp,
+            fontWeight= FontWeight.Bold,
+            color= Color.Black,
+            modifier= Modifier.padding(16.dp)
         )
 
-        // Horizontal Pager for Exercise Groups
-        val exercisePagerState = rememberPagerState()
+        // Horizontal Pager for Exercise Groups displaying four cards in two rows.
+        val exercisePagerState= rememberPagerState { exerciseGroups.size }
+
         HorizontalPager(
-            count = exerciseGroups.size,
-            state = exercisePagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
+            state= exercisePagerState,
+            modifier= Modifier.fillMaxWidth().height(250.dp), // Adjust height to fit the grid layout.
         ) { page ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                // Separate 4 Exercise Cards
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        exerciseGroups[page].take(2).forEach { exercise ->
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    exerciseGroups[page].forEachIndexed { index, exercise ->
+                        if (index < 2) { // First row with two exercises.
                             Card(
-                                modifier = Modifier
+                                modifier= Modifier
                                     .weight(1f)
-                                    .aspectRatio(1f)
-                                    .padding(4.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
+                                    .size(100.dp) // Set a smaller size for the card.
+                                    .padding(4.dp), // Add padding between cards.
+                                colors= CardDefaults.cardColors(containerColor= Color.LightGray),
+                                shape= RoundedCornerShape(8.dp),
+                                elevation= CardDefaults.cardElevation(defaultElevation= 4.dp)
                             ) {
                                 Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
+                                    modifier= Modifier.fillMaxSize(),
+                                    contentAlignment= Alignment.Center
                                 ) {
                                     Text(
-                                        text = "Exercise $exercise",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Black
+                                        text= "Exercise $exercise",
+                                        fontSize= 14.sp,
+                                        fontWeight= FontWeight.Bold,
+                                        color= Color.Black
                                     )
                                 }
                             }
                         }
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        exerciseGroups[page].drop(2).forEach { exercise ->
+                }
+
+                Spacer(modifier = Modifier.height(8.dp)) // Space between rows
+                Row(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    exerciseGroups[page].forEachIndexed { index, exercise ->
+                        if (index >= 2) { // Second row with two exercises.
                             Card(
-                                modifier = Modifier
+                                modifier= Modifier
                                     .weight(1f)
-                                    .aspectRatio(1f)
-                                    .padding(4.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
+                                    .size(100.dp) // Set a smaller size for the card.
+                                    .padding(4.dp), // Add padding between cards.
+                                colors= CardDefaults.cardColors(containerColor= Color.LightGray),
+                                shape= RoundedCornerShape(8.dp),
+                                elevation= CardDefaults.cardElevation(defaultElevation= 4.dp)
                             ) {
                                 Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
+                                    modifier= Modifier.fillMaxSize(),
+                                    contentAlignment= Alignment.Center
                                 ) {
                                     Text(
-                                        text = "Exercise $exercise",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Black
+                                        text= "Exercise $exercise",
+                                        fontSize= 14.sp,
+                                        fontWeight= FontWeight.Bold,
+                                        color= Color.Black
                                     )
                                 }
                             }
@@ -180,12 +179,31 @@ fun ExploreScreen(paddingValues: PaddingValues) {
             }
         }
 
-        HorizontalPagerIndicator(
-            pagerState = exercisePagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(8.dp)
-        )
+        // Custom Pager Indicator for Exercise Groups.
+        PagerIndicator(currentPageIndex= exercisePagerState.currentPage, pageCount= exerciseGroups.size)
+
+        Spacer(modifier= Modifier.height(16.dp))
     }
 }
 
+@Composable
+fun PagerIndicator(currentPageIndex: Int, pageCount: Int) {
+    Row(
+        modifier= Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .padding(bottom= 8.dp),
+        horizontalArrangement= Arrangement.Center
+    ) {
+        repeat(pageCount) { iteration ->
+            val color= if (currentPageIndex == iteration) Color.DarkGray else Color.LightGray
+
+            Box(
+                modifier= Modifier
+                    .padding(2.dp)
+                    .size(8.dp)
+                    .background(color, shape= RoundedCornerShape(8.dp))
+            )
+        }
+    }
+}
