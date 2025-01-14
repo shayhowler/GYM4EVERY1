@@ -1,6 +1,7 @@
 package com.gym4every1.routes.app_routes.explore
 
 import com.gym4every1.models.workout_plans_models.Exercise
+import kotlin.random.Random
 
 // Updated fetchWorkoutProgram function with all exercises categories integrated
 fun fetchWorkoutProgram(programName: String, level: String = "Easy"): List<Exercise> {
@@ -200,4 +201,31 @@ val program = when (programName) {
 }
 
 return program
+}
+fun getShuffledRandomExercises(level: String = "Easy"): List<Exercise> {
+    // List of available program names
+    val programs = listOf(
+        "Cardio",
+        "Arm Training",
+        "Lower Body Training",
+        "Back Training",
+        "Chest Training",
+        "Core Training"
+    )
+
+    // Select 6 random programs
+    val selectedPrograms = programs.shuffled(Random.Default).take(6)
+
+    // Fetch 2 random exercises from each selected program
+    val exercises = selectedPrograms.flatMap { program ->
+        val programExercises = fetchWorkoutProgram(program, level)
+        if (programExercises.size <= 2) {
+            programExercises
+        } else {
+            programExercises.shuffled(Random.Default).take(2)
+        }
+    }
+
+    // Shuffle the resulting exercises
+    return exercises.shuffled(Random.Default)
 }

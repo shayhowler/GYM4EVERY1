@@ -66,7 +66,7 @@ fun SecondNavigation(
                         showSavedVibes = showSavedVibes // Pass state here
                     )
                 }
-                composable("explorePage") { ExploreScreen(paddingValues) }
+                composable("explorePage") { ExploreScreen(navController,paddingValues) }
                 composable("statsPage") { StatsScreen(navController, supabaseClient, paddingValues) }
                 composable("detail/sleep") { SleepTrackingPage(navController, supabaseClient, paddingValues) }
                 composable("detail/water") { WaterTrackingPage(navController, supabaseClient, paddingValues) }
