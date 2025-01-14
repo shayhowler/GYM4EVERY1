@@ -27,6 +27,7 @@ import kotlinx.serialization.json.JsonObject
 class FeedViewModel() : ViewModel() {
     val vibes = mutableStateListOf<Vibe>()
     val savedVibeIds = mutableStateListOf<String>() // Track saved vibe IDs
+    val likedVibeIds = mutableStateListOf<String>() // Track saved vibe IDs
     private val supabaseClient = SupabaseClientManager.getSupabaseClient()
     val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id
 
@@ -61,22 +62,33 @@ class FeedViewModel() : ViewModel() {
 
                 savedVibeIds.addAll(savedVibes.map { it.vibe_id })
 
+                likedVibeIds.clear()
+                val likedVibes = supabaseClient.from("vibe_likes")
+                    .select()
+                    .decodeList<VibeLikes>()
+                    .filter { it.user_id == userId }
+
+                likedVibeIds.addAll(likedVibes.map { it.vibe_id })
+
                 // Fetch vibes
                 val fetchedVibes = if (showSaved) {
                     vibes.filter { it.id in savedVibeIds }
                 } else {
                     supabaseClient.from("vibes").select().decodeList<Vibe>()
                 }
-
                 vibes.clear()
                 vibes.addAll(fetchedVibes.sortedByDescending { it.created_at })
 
                 // Fetch like counts for each vibe
                 fetchedVibes.forEach { vibe ->
-                    vibe.like_count = supabaseClient.from("vibe_likes")
+                    // Fetch the count of likes for each vibe
+                    val likeCount = supabaseClient.from("vibe_likes")
                         .select(Columns.list("id", "user_id", "username", "vibe_id", "created_at"))
                         .decodeList<VibeLikes>()
                         .count { it.vibe_id == vibe.id }
+
+                    // Update the vibe's like count
+                    vibe.like_count = likeCount
                 }
             } catch (e: Exception) {
                 println("Error fetching vibes: ${e.message}")
@@ -86,6 +98,10 @@ class FeedViewModel() : ViewModel() {
 
     fun isVibeSaved(vibeId: String): Boolean {
         return savedVibeIds.contains(vibeId)
+    }
+
+    fun isVibeLiked(vibeId: String): Boolean {
+        return likedVibeIds.contains(vibeId)
     }
 
     suspend fun saveVibe(supabaseClient: SupabaseClient, vibeId: String) {
@@ -167,17 +183,12 @@ class FeedViewModel() : ViewModel() {
     }
 
     private suspend fun handleLikeAdded(likeRecord: JsonObject) {
-        // Deserialize the likeRecord to VibeLikes object
         val like = Json.decodeFromString<VibeLikes>(likeRecord.toString())
 
-        // Find the corresponding vibe object
+        // Find the vibe and increment the like count
         val vibe = vibes.find { it.id == like.vibe_id }
-
         if (vibe != null) {
-            // Increment the local like count
             vibe.like_count = (vibe.like_count ?: 0) + 1
-
-            // Update the like count in the database
             updateLikeCountInDatabase(like.vibe_id, vibe.like_count)
         }
     }

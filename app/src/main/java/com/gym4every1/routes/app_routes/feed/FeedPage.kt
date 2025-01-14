@@ -84,7 +84,7 @@ fun FeedScreen(
                 }
 
                 val isSaved = viewModel.isVibeSaved(vibe.id)
-                val isLiked = (vibe.like_count ?: 0) > 0 // Check if the vibe has likes
+                val isLiked = viewModel.isVibeLiked(vibe.id)
 
                 PostCard(
                     profilePictureUrl = profilePictureUrl ?: "",
