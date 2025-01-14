@@ -50,6 +50,20 @@ android {
             value = supabaseAnonKey
         )
 
+        val rapidApiKey = properties.getProperty("RAPID_API_KEY") ?: ""
+        buildConfigField(
+            type = "String",
+            name = "RAPID_API_KEY",
+            value = rapidApiKey
+        )
+
+        val rapidApiHost = properties.getProperty("RAPID_API_HOST") ?: ""
+        buildConfigField(
+            type = "String",
+            name = "RAPID_API_HOST",
+            value = rapidApiHost
+        )
+
     }
 
     buildTypes {

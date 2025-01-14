@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.gym4every1.routes.app_routes.components.BottomNavigationBar
 import com.gym4every1.routes.app_routes.components.TopBar
+import com.gym4every1.routes.app_routes.explore.ExerciseDetailsScreen
 import com.gym4every1.routes.app_routes.explore.ExploreScreen
 import com.gym4every1.routes.app_routes.explore.WorkoutScreen
 import com.gym4every1.routes.app_routes.feed.FeedScreen
@@ -50,7 +51,10 @@ fun SecondNavigation(
             }
         },
         bottomBar = {
-            if (currentRoute != "transitionPage2") {
+            if (currentRoute != "transitionPage2" && currentRoute != "workoutScreen/{workoutName}/{imageUrl}"
+                && currentRoute!= "exerciseDetails/{exerciseId}" && currentRoute!= "exerciseTimer/{programName}"
+                && currentRoute!= "detail/sleep" && currentRoute!= "detail/water" && currentRoute!= "detail/nutrition"
+                && currentRoute!= "meal_details/{mealType}"){
                 BottomNavigationBar(navController)
             }
         },
@@ -90,6 +94,10 @@ fun SecondNavigation(
                     val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Cardio"
                     val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
                     WorkoutScreen(navController, paddingValues, programName = workoutName, thumbnailUrl = imageUrl)
+                }
+                composable("exerciseDetails/{exerciseId}") { backStackEntry ->
+                    val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: return@composable
+                    ExerciseDetailsScreen(paddingValues, exerciseId)
                 }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }
             }
