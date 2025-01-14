@@ -191,7 +191,7 @@ val coreExercises = when (level) {
 // Combine all exercises into a single list for the workout program
 val program = when (programName) {
     "Cardio" -> cardioWarmUp + cardioExercises + generalCoolDown
-    "Hand Training" -> armWarmUp + armExercises + generalCoolDown
+    "Arm Training" -> armWarmUp + armExercises + generalCoolDown
     "Lower Body Training" -> lowerBodyWarmUp + lowerBodyExercises + generalCoolDown
     "Back Training" -> backWarmUp + backExercises + generalCoolDown
     "Chest Training" -> chestWarmUp + chestExercises + generalCoolDown
