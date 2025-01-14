@@ -13,11 +13,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.gym4every1.models.workout_plans_models.Exercise
 import com.gym4every1.routes.app_routes.components.BottomNavigationBar
 import com.gym4every1.routes.app_routes.components.TopBar
 import com.gym4every1.routes.app_routes.explore.ExerciseDetailsScreen
+import com.gym4every1.routes.app_routes.explore.ExerciseTimerScreen
 import com.gym4every1.routes.app_routes.explore.ExploreScreen
 import com.gym4every1.routes.app_routes.explore.WorkoutScreen
+import com.gym4every1.routes.app_routes.explore.fetchWorkoutProgram
 import com.gym4every1.routes.app_routes.feed.FeedScreen
 import com.gym4every1.routes.app_routes.profile.ProfileScreen
 import com.gym4every1.routes.app_routes.stats.MealDetailsScreen
@@ -98,6 +101,23 @@ fun SecondNavigation(
                 composable("exerciseDetails/{exerciseId}") { backStackEntry ->
                     val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: return@composable
                     ExerciseDetailsScreen(paddingValues, exerciseId)
+                }
+                composable("exerciseTimer/{programName}") { backStackEntry ->
+                    val programName = backStackEntry.arguments?.getString("programName") ?: return@composable
+
+                    // Fetch workout program and map exercises to Exercise
+                    val exercises = fetchWorkoutProgram(programName).map { exercise ->
+                        Exercise(
+                            name = exercise.name,
+                            duration = exercise.duration,
+                            breakDuration = exercise.breakDuration // Use breakDuration if you need it
+                        )
+                    }
+                    ExerciseTimerScreen(
+                        paddingValues,
+                        exercises = exercises,
+                        onWorkoutComplete = { navController.popBackStack() }
+                    )
                 }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }
             }
