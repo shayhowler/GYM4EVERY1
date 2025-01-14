@@ -39,9 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.gym4every1.models.workout_plans_models.Exercise
+import io.github.jan.supabase.SupabaseClient
 
 @Composable
-fun WorkoutScreen(navController: NavController, paddingValues: PaddingValues, programName: String, thumbnailUrl: String) {
+fun WorkoutScreen(navController: NavController, supabaseClient: SupabaseClient, paddingValues: PaddingValues, programName: String, thumbnailUrl: String) {
     val workoutDescriptions = mapOf(
         "Cardio" to "Cardio exercises are designed to increase heart rate and improve cardiovascular fitness. This program includes activities that get you moving and burning calories.",
         "Arm Training" to "Focus on strengthening your hands and forearms with exercises designed to improve grip strength and flexibility.",
@@ -54,10 +55,10 @@ fun WorkoutScreen(navController: NavController, paddingValues: PaddingValues, pr
     val description = workoutDescriptions[programName] ?: "No description available for this program."
 
     var exercises by remember { mutableStateOf<List<Exercise>?>(null) }
-    var workoutFinished by remember { mutableStateOf(false) }
+    val workoutFinished by remember { mutableStateOf(false) }
 
     LaunchedEffect(programName) {
-        exercises = fetchWorkoutProgram(programName)
+        exercises = fetchWorkoutProgram(supabaseClient, programName)
     }
 
     if (workoutFinished) {

@@ -24,7 +24,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,9 +42,11 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.gym4every1.models.workout_plans_models.Exercise
+import io.github.jan.supabase.SupabaseClient
 
 @Composable
-fun ExploreScreen(navController: NavController, paddingValues: PaddingValues) {
+fun ExploreScreen(navController: NavController, supabaseClient: SupabaseClient, paddingValues: PaddingValues) {
     val context = LocalContext.current
     BackHandler {
         Toast.makeText(context, "You can't go back!", Toast.LENGTH_SHORT).show()
@@ -56,7 +62,15 @@ fun ExploreScreen(navController: NavController, paddingValues: PaddingValues) {
         "Chest Training" to "https://images.pexels.com/photos/18060023/pexels-photo-18060023/free-photo-of-bodybuilder-working-out-on-weight-bench.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
         "Core Training" to "https://images.pexels.com/photos/3076516/pexels-photo-3076516.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
     )
-    val exercises = remember { getShuffledRandomExercises() } // List of Exercise objects
+
+    // State to hold exercises
+    var exercises by remember { mutableStateOf(emptyList<Exercise>()) }
+
+    // Fetch exercises asynchronously
+    LaunchedEffect(supabaseClient) {
+        exercises = getShuffledRandomExercises(supabaseClient) // Suspend function call
+    }
+
     val exerciseGroups = exercises.map { it.name }.chunked(4) // Group exercise names into rows of 4
     Column(
         modifier = Modifier
@@ -121,7 +135,6 @@ fun ExploreScreen(navController: NavController, paddingValues: PaddingValues) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
         // Horizontal Pager for Other Workouts
         val otherWorkoutPagerState = rememberPagerState { otherWorkouts.size }
         HorizontalPager(
@@ -169,7 +182,7 @@ fun ExploreScreen(navController: NavController, paddingValues: PaddingValues) {
             pageCount = otherWorkouts.size
         )
 
-// Title: Best for You
+        // Title: Best for You
         Text(
             text = "Best for You",
             fontSize = 20.sp,
@@ -177,7 +190,6 @@ fun ExploreScreen(navController: NavController, paddingValues: PaddingValues) {
             color = Color.Black,
             modifier = Modifier.padding(start = 16.dp)
         )
-
         // Horizontal Pager for Exercise Groups
         val exercisePagerState = rememberPagerState { exerciseGroups.size }
         HorizontalPager(
@@ -232,7 +244,6 @@ fun ExploreScreen(navController: NavController, paddingValues: PaddingValues) {
                         }
                     }
                 }
-
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier

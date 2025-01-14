@@ -3,6 +3,7 @@ package com.gym4every1.routes.navigation_handling
 import android.content.Context
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,7 +75,7 @@ fun SecondNavigation(
                         showSavedVibes = showSavedVibes // Pass state here
                     )
                 }
-                composable("explorePage") { ExploreScreen(navController,paddingValues) }
+                composable("explorePage") { ExploreScreen(navController,supabaseClient, paddingValues) }
                 composable("statsPage") { StatsScreen(navController, supabaseClient, paddingValues) }
                 composable("detail/sleep") { SleepTrackingPage(navController, supabaseClient, paddingValues) }
                 composable("detail/water") { WaterTrackingPage(navController, supabaseClient, paddingValues) }
@@ -96,7 +97,7 @@ fun SecondNavigation(
                 ) { backStackEntry ->
                     val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Cardio"
                     val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
-                    WorkoutScreen(navController, paddingValues, programName = workoutName, thumbnailUrl = imageUrl)
+                    WorkoutScreen(navController, supabaseClient, paddingValues, programName = workoutName, thumbnailUrl = imageUrl)
                 }
                 composable("exerciseDetails/{exerciseId}") { backStackEntry ->
                     val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: return@composable
@@ -105,17 +106,21 @@ fun SecondNavigation(
                 composable("exerciseTimer/{programName}") { backStackEntry ->
                     val programName = backStackEntry.arguments?.getString("programName") ?: return@composable
 
-                    // Fetch workout program and map exercises to Exercise
-                    val exercises = fetchWorkoutProgram(programName).map { exercise ->
-                        Exercise(
-                            name = exercise.name,
-                            duration = exercise.duration,
-                            breakDuration = exercise.breakDuration // Use breakDuration if you need it
-                        )
+                    val exercises = remember { mutableStateOf<List<Exercise>>(emptyList()) }
+
+                    LaunchedEffect(programName) {
+                        exercises.value = fetchWorkoutProgram(supabaseClient, programName).map { exercise ->
+                            Exercise(
+                                name = exercise.name,
+                                duration = exercise.duration,
+                                breakDuration = exercise.breakDuration
+                            )
+                        } // Use breakDuration if you need it
                     }
+
                     ExerciseTimerScreen(
                         paddingValues,
-                        exercises = exercises,
+                        exercises = exercises.value,
                         onWorkoutComplete = { navController.popBackStack() }
                     )
                 }

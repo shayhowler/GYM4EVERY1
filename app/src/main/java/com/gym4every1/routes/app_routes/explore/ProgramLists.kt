@@ -1,10 +1,22 @@
 package com.gym4every1.routes.app_routes.explore
 
+import com.gym4every1.database.fetchActivityLevel
 import com.gym4every1.models.workout_plans_models.Exercise
+import io.github.jan.supabase.SupabaseClient
 import kotlin.random.Random
 
 // Updated fetchWorkoutProgram function with all exercises categories integrated
-fun fetchWorkoutProgram(programName: String, level: String = "Easy"): List<Exercise> {
+suspend fun fetchWorkoutProgram(supabaseClient: SupabaseClient, programName: String): List<Exercise> {
+    val activityLevel = fetchActivityLevel(supabaseClient)
+
+    // Map the activity level to "Easy", "Medium", or "Expert"
+    val mappedLevel = when (activityLevel?.toInt()) {
+        in 1..2 -> "Easy"        // Beginner
+        in 3..4 -> "Medium"      // Intermediate
+        5 -> "Expert"            // Expert
+        else -> "Easy"           // Default to Easy if level is null or out of bounds
+    }
+
     // General Warm-Up Exercises (Cardio)
     val cardioWarmUp = listOf(
         Exercise("Rope_Jumping", 30, 10),
@@ -62,7 +74,7 @@ fun fetchWorkoutProgram(programName: String, level: String = "Easy"): List<Exerc
     )
 
     // Arm Exercises based on levels
-    val armExercises = when (level) {
+    val armExercises = when (mappedLevel) {
         "Easy" -> listOf(
             Exercise("Dumbbell_Alternate_Bicep_Curl", 60, 20),
             Exercise("EZ-Bar_Curl", 60, 20),
@@ -86,9 +98,8 @@ fun fetchWorkoutProgram(programName: String, level: String = "Easy"): List<Exerc
         )
         else -> emptyList()
     }
-
     // Lower Body Exercises based on levels
-    val lowerBodyExercises = when (level) {
+    val lowerBodyExercises = when (mappedLevel) {
         "Easy" -> listOf(
             Exercise("Dumbbell_Squat", 60, 20),
             Exercise("Goblet_Squat", 60, 20),
@@ -113,96 +124,96 @@ fun fetchWorkoutProgram(programName: String, level: String = "Easy"): List<Exerc
         else -> emptyList()
     }
 // Back Exercises based on levels
-val backExercises = when (level) {
-    "Easy" -> listOf(
-        Exercise("Bent_Over_Two-Dumbbell_Row", 60, 20),
-        Exercise("Seated_Cable_Shoulder_Press", 60, 20),
-        Exercise("Reverse_Flyes_With_External_Rotation", 60, 20),
-        Exercise("One-Arm_Kettlebell_Row", 60, 20),
-        Exercise("Bent_Over_Two-Dumbbell_Row_With_Palms_In", 60, 20)
-    )
-    "Medium" -> listOf(
-        Exercise("Reverse_Grip_Bent-Over_Rows", 120, 30),
-        Exercise("Seated_Cable_Shoulder_Press", 120, 30),
-        Exercise("Face_Pull", 120, 30),
-        Exercise("Leverage_Decline_Chest_Press", 120, 30),
-        Exercise("Reverse_Triceps_Bench_Press", 120, 30)
-    )
-    "Expert" -> listOf(
-        Exercise("Deficit_Deadlift", 180, 30),
-        Exercise("Flat_Bench_Leg_Pull-In", 180, 30),
-        Exercise("Double_Kettlebell_Alternating_Hang_Clean", 180, 30),
-        Exercise("Push-Ups_With_Feet_Elevated", 180, 30),
-        Exercise("Scissor_Kick", 180, 30)
-    )
-    else -> emptyList()
-}
+    val backExercises = when (mappedLevel) {
+        "Easy" -> listOf(
+            Exercise("Bent_Over_Two-Dumbbell_Row", 60, 20),
+            Exercise("Seated_Cable_Shoulder_Press", 60, 20),
+            Exercise("Reverse_Flyes_With_External_Rotation", 60, 20),
+            Exercise("One-Arm_Kettlebell_Row", 60, 20),
+            Exercise("Bent_Over_Two-Dumbbell_Row_With_Palms_In", 60, 20)
+        )
+        "Medium" -> listOf(
+            Exercise("Reverse_Grip_Bent-Over_Rows", 120, 30),
+            Exercise("Seated_Cable_Shoulder_Press", 120, 30),
+            Exercise("Face_Pull", 120, 30),
+            Exercise("Leverage_Decline_Chest_Press", 120, 30),
+            Exercise("Reverse_Triceps_Bench_Press", 120, 30)
+        )
+        "Expert" -> listOf(
+            Exercise("Deficit_Deadlift", 180, 30),
+            Exercise("Flat_Bench_Leg_Pull-In", 180, 30),
+            Exercise("Double_Kettlebell_Alternating_Hang_Clean", 180, 30),
+            Exercise("Push-Ups_With_Feet_Elevated", 180, 30),
+            Exercise("Scissor_Kick", 180, 30)
+        )
+        else -> emptyList()
+    }
 
-val chestExercises = when (level) {
-    "Easy" -> listOf(
-        Exercise("Flat_Bench_Cable_Flyes", 60, 20),
-        Exercise("Dumbbell_Flyes", 60, 20),
-        Exercise("Machine_Bench_Press", 60, 20),
-        Exercise("Double_Kettlebell_Push_Press", 60, 20),
-        Exercise("Cable_Crossover", 60, 20)
-    )
-    "Medium" -> listOf(
-        Exercise("Incline_Hammer_Curls", 120, 30),
-        Exercise("Front_Cable_Raise", 120, 30),
-        Exercise("Cable_Chest_Press", 120, 30),
-        Exercise("Dumbbell_Shoulder_Press", 120, 30),
-        Exercise("Clean_Pull", 120, 30)
-    )
-    "Expert" -> listOf(
-        Exercise("Smith_Machine_Incline_Bench_Press", 180, 30),
-        Exercise("Wide-Grip_Barbell_Bench_Press", 180, 30),
-        Exercise("Band_Good_Morning", 180, 30),
-        Exercise("Sledgehammer_Swings", 180, 30),
-        Exercise("Reverse_Band_Bench_Press", 180, 30)
-    )
-    else -> emptyList()
-}
+    val chestExercises = when (mappedLevel) {
+        "Easy" -> listOf(
+            Exercise("Flat_Bench_Cable_Flyes", 60, 20),
+            Exercise("Dumbbell_Flyes", 60, 20),
+            Exercise("Machine_Bench_Press", 60, 20),
+            Exercise("Double_Kettlebell_Push_Press", 60, 20),
+            Exercise("Cable_Crossover", 60, 20)
+        )
+        "Medium" -> listOf(
+            Exercise("Incline_Hammer_Curls", 120, 30),
+            Exercise("Front_Cable_Raise", 120, 30),
+            Exercise("Cable_Chest_Press", 120, 30),
+            Exercise("Dumbbell_Shoulder_Press", 120, 30),
+            Exercise("Clean_Pull", 120, 30)
+        )
+        "Expert" -> listOf(
+            Exercise("Smith_Machine_Incline_Bench_Press", 180, 30),
+            Exercise("Wide-Grip_Barbell_Bench_Press", 180, 30),
+            Exercise("Band_Good_Morning", 180, 30),
+            Exercise("Sledgehammer_Swings", 180, 30),
+            Exercise("Reverse_Band_Bench_Press", 180, 30)
+        )
+        else -> emptyList()
+    }
 
 // Core Exercises based on levels
-val coreExercises = when (level) {
-    "Easy" -> listOf(
-        Exercise("Sit-Up", 60, 20),
-        Exercise("Flutter_Kicks", 60, 20),
-        Exercise("Cross_Over_-_With_Bands", 60, 20),
-        Exercise("Parallel_Bar_Dip", 60, 20),
-        Exercise("Lying_Close-Grip_Barbell_Triceps_Extension_Behind_The_Head", 60, 20)
-    )
-    "Medium" -> listOf(
-        Exercise("Platform_Hamstring_Slides", 120, 30),
-        Exercise("Sandbag_Load", 120, 30),
-        Exercise("Floor_Press_with_Chains", 120, 30),
-        Exercise("Shoulder_Press_-_With_Bands", 120, 30),
-        Exercise("Flat_Bench_Cable_Flyes", 120, 30)
-    )
-    "Expert" -> listOf(
-        Exercise("Hang_Snatch_-_Below_Knees", 180, 30),
-        Exercise("Hanging_Bar_Good_Morning", 180, 30),
-        Exercise("One-Arm_Kettlebell_Clean_and_Jerk", 180, 30),
-        Exercise("Pushups_Close_and_Wide_Hand_Positions", 180, 30),
-        Exercise("Oblique_Crunches_-_On_The_Floor", 180, 30)
-    )
-    else -> emptyList()
+    val coreExercises = when (mappedLevel) {
+        "Easy" -> listOf(
+            Exercise("Sit-Up", 60, 20),
+            Exercise("Flutter_Kicks", 60, 20),
+            Exercise("Cross_Over_-_With_Bands", 60, 20),
+            Exercise("Parallel_Bar_Dip", 60, 20),
+            Exercise("Lying_Close-Grip_Barbell_Triceps_Extension_Behind_The_Head", 60, 20)
+        )
+        "Medium" -> listOf(
+            Exercise("Platform_Hamstring_Slides", 120, 30),
+            Exercise("Sandbag_Load", 120, 30),
+            Exercise("Floor_Press_with_Chains", 120, 30),
+            Exercise("Shoulder_Press_-_With_Bands", 120, 30),
+            Exercise("Flat_Bench_Cable_Flyes", 120, 30)
+        )
+        "Expert" -> listOf(
+            Exercise("Hang_Snatch_-_Below_Knees", 180, 30),
+            Exercise("Hanging_Bar_Good_Morning", 180, 30),
+            Exercise("One-Arm_Kettlebell_Clean_and_Jerk", 180, 30),
+            Exercise("Pushups_Close_and_Wide_Hand_Positions", 180, 30),
+            Exercise("Oblique_Crunches_-_On_The_Floor", 180, 30)
+        )
+        else -> emptyList()
+    }
+    // Combine all exercises into a single list for the workout program
+    val program = when (programName) {
+        "Cardio" -> cardioWarmUp + cardioExercises + generalCoolDown
+        "Arm Training" -> armWarmUp + armExercises + generalCoolDown
+        "Lower Body Training" -> lowerBodyWarmUp + lowerBodyExercises + generalCoolDown
+        "Back Training" -> backWarmUp + backExercises + generalCoolDown
+        "Chest Training" -> chestWarmUp + chestExercises + generalCoolDown
+        "Core Training" -> coreWarmUp + coreExercises + generalCoolDown
+        else -> emptyList()
+    }
+
+    return program
 }
 
-// Combine all exercises into a single list for the workout program
-val program = when (programName) {
-    "Cardio" -> cardioWarmUp + cardioExercises + generalCoolDown
-    "Arm Training" -> armWarmUp + armExercises + generalCoolDown
-    "Lower Body Training" -> lowerBodyWarmUp + lowerBodyExercises + generalCoolDown
-    "Back Training" -> backWarmUp + backExercises + generalCoolDown
-    "Chest Training" -> chestWarmUp + chestExercises + generalCoolDown
-    "Core Training" -> coreWarmUp + coreExercises + generalCoolDown
-    else -> emptyList()
-}
-
-return program
-}
-fun getShuffledRandomExercises(level: String = "Easy"): List<Exercise> {
+suspend fun getShuffledRandomExercises(supabaseClient: SupabaseClient): List<Exercise> {
     // List of available program names
     val programs = listOf(
         "Cardio",
@@ -218,7 +229,7 @@ fun getShuffledRandomExercises(level: String = "Easy"): List<Exercise> {
 
     // Fetch 2 random exercises from each selected program
     val exercises = selectedPrograms.flatMap { program ->
-        val programExercises = fetchWorkoutProgram(program, level)
+        val programExercises = fetchWorkoutProgram(supabaseClient, program)
         if (programExercises.size <= 2) {
             programExercises
         } else {
