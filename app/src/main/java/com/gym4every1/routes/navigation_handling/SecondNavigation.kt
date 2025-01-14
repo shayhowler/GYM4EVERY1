@@ -8,14 +8,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.gym4every1.routes.app_routes.components.BottomNavigationBar
 import com.gym4every1.routes.app_routes.components.TopBar
 import com.gym4every1.routes.app_routes.explore.ExploreScreen
 import com.gym4every1.routes.app_routes.feed.FeedScreen
 import com.gym4every1.routes.app_routes.profile.ProfileScreen
+import com.gym4every1.routes.app_routes.stats.MealDetailsScreen
 import com.gym4every1.routes.app_routes.stats.NutritionTrackingPage
 import com.gym4every1.routes.app_routes.stats.SleepTrackingPage
 import com.gym4every1.routes.app_routes.stats.StatsScreen
@@ -67,7 +70,15 @@ fun SecondNavigation(
                 composable("statsPage") { StatsScreen(navController, supabaseClient, paddingValues) }
                 composable("detail/sleep") { SleepTrackingPage(navController, supabaseClient, paddingValues) }
                 composable("detail/water") { WaterTrackingPage(navController, supabaseClient, paddingValues) }
-                composable("detail/nutrition") { NutritionTrackingPage(navController, paddingValues) }
+                composable("detail/nutrition") { NutritionTrackingPage(navController) }
+                composable(
+                    "meal_details/{mealType}",
+                    arguments = listOf(navArgument("mealType") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    MealDetailsScreen(
+                        mealType = backStackEntry.arguments?.getString("mealType") ?: "",
+                    )
+                }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }
             }
         }
