@@ -94,13 +94,13 @@ fun SecondNavigation(
                 composable("statsPage") { StatsScreen(navController, supabaseClient, paddingValues) }
                 composable("detail/sleep") { SleepTrackingPage(navController, supabaseClient, paddingValues) }
                 composable("detail/water") { WaterTrackingPage(navController, supabaseClient, paddingValues) }
-                composable("detail/nutrition") { NutritionTrackingPage(navController) }
+                composable("detail/nutrition") { NutritionTrackingPage(navController, supabaseClient) }
                 composable(
                     "meal_details/{mealType}",
                     arguments = listOf(navArgument("mealType") { type = NavType.StringType })
                 ) { backStackEntry ->
                     MealDetailsScreen(
-                        mealType = backStackEntry.arguments?.getString("mealType") ?: "",
+                        supabaseClient, mealType = backStackEntry.arguments?.getString("mealType") ?: "",
                     )
                 }
                 composable(

@@ -21,10 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,8 +37,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.gym4every1.api_integrations.nutrition_api_fetch.fetchNutritionDataFromAPI
+import com.gym4every1.database.fetchUsername
+import com.gym4every1.database.nutrition_operations.fetchNutritionTrackingData
+import com.gym4every1.database.nutrition_operations.insertNutritionTrackingData
 import com.gym4every1.models.nutrition_tracking_models.NutritionData
 import com.gym4every1.routes.app_routes.components.GlobalTrackingPage
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.launch
+import java.util.Date
 
 object NutritionState {
     val selectedMeals = mutableStateOf<Map<String, List<NutritionData>>>(emptyMap())
@@ -75,11 +84,23 @@ object NutritionState {
         }
     }
 }
-
 @Composable
-fun NutritionTrackingPage(navController: NavHostController) {
+fun NutritionTrackingPage(navController: NavHostController, supabaseClient: SupabaseClient) {
+    val selectedDate = Date() // Set to current date or selected date
+    val totalNutrients = remember { mutableStateOf<Map<String, Float>>(emptyMap()) }
+
+    // Fetch nutrition tracking data when the page is first loaded
+    LaunchedEffect(Unit) {
+        val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id.toString()
+        val fetchedData = fetchNutritionTrackingData(supabaseClient, userId, selectedDate)
+        // Populate NutritionState with fetched data
+        fetchedData.forEach { nutrition ->
+            NutritionState.addMeal(nutrition.mealType, nutrition)
+        }
+        totalNutrients.value = NutritionState.totalNutrients.value
+    }
+
     val selectedMeals = NutritionState.selectedMeals.value
-    val totalNutrients = NutritionState.totalNutrients.value
     val mealTypes = listOf("Breakfast", "Lunch", "Dinner", "Snacks/Other")
     Column(modifier = Modifier.fillMaxSize()) {
         GlobalTrackingPage(
@@ -88,10 +109,10 @@ fun NutritionTrackingPage(navController: NavHostController) {
         ) {
             // Display total daily nutrients
             Text(
-                text = "Total Nutrients:\nCalories: ${totalNutrients["calories"] ?: 0f} | " +
-                        "Carbs: ${totalNutrients["carbs"] ?: 0f}g | " +
-                        "Protein: ${totalNutrients["protein"] ?: 0f}g | " +
-                        "Fat: ${totalNutrients["fat"] ?: 0f}g",
+                text = "Total Nutrients:\nCalories: ${totalNutrients.value["calories"] ?: 0f} | " +
+                        "Carbs: ${totalNutrients.value["carbs"] ?: 0f}g | " +
+                        "Protein: ${totalNutrients.value["protein"] ?: 0f}g | " +
+                        "Fat: ${totalNutrients.value["fat"] ?: 0f}g",
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -110,14 +131,30 @@ fun NutritionTrackingPage(navController: NavHostController) {
     }
 }
 
-
 @Composable
-fun MealDetailsScreen(mealType: String) {
+fun MealDetailsScreen(supabaseClient: SupabaseClient, mealType: String) {
     val selectedMeals = NutritionState.selectedMeals.value[mealType] ?: emptyList()
     val totalNutrients = NutritionState.calculateMealNutrients(selectedMeals)
     var showSearchDialog by remember { mutableStateOf(false) }
     val searchResults = remember { mutableStateOf<List<NutritionData>>(emptyList()) }
     val isLoading = remember { mutableStateOf(false) }
+
+    // Retrieve userId and username
+    val userId = supabaseClient.auth.currentSessionOrNull()?.user?.id ?: ""
+    val username = remember { mutableStateOf("") }
+
+    // Current date
+    val selectedDate = Date() // Get the current date
+
+    // Coroutine scope for async tasks
+    val coroutineScope = rememberCoroutineScope()
+
+    // Fetch the username asynchronously with LaunchedEffect
+    LaunchedEffect(userId) {
+        if (userId.isNotEmpty() && username.value.isEmpty()) {
+            username.value = fetchUsername(supabaseClient, userId).toString()
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         GlobalTrackingPage(
@@ -135,8 +172,7 @@ fun MealDetailsScreen(mealType: String) {
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Meal items
+// Meal items
             if (selectedMeals.isEmpty()) {
                 Text("No items added to this meal yet.")
             } else {
@@ -166,16 +202,34 @@ fun MealDetailsScreen(mealType: String) {
                     },
                     nutritionData = searchResults.value,
                     onSelectProduct = { nutritionData ->
+                        // Add the nutrition data to the selected meals
                         NutritionState.addMeal(mealType, nutritionData)
+
+                        // Insert or update the nutrition data in the Supabase database in coroutine scope
+                        coroutineScope.launch {
+                            insertNutritionTrackingData(
+                                supabaseClient,
+                                userId,
+                                username.value,
+                                selectedDate,
+                                NutritionState.selectedMeals.value.values.flatten()
+                            )
+                        }
+
                         showSearchDialog = false
                     },
                     onDismiss = { showSearchDialog = false },
-                    isLoading = isLoading
+                    isLoading = isLoading,
                 )
             }
         }
     }
 }
+
+
+
+
+
 @Composable
 fun MealItemCard(item: NutritionData) {
     Card(modifier = Modifier
@@ -230,13 +284,11 @@ fun SearchDialog(
     onDismiss: () -> Unit,
     searchQuery: MutableState<String>,
     onSearch: (String) -> Unit,
-    nutritionData: List<NutritionData>, // List of NutritionData
-    onSelectProduct: (NutritionData) -> Unit, // Callback for selecting a product
+    nutritionData: List<NutritionData>,
+    onSelectProduct: (NutritionData) -> Unit,
     isLoading: MutableState<Boolean>
 ) {
-
     val focusManager = LocalFocusManager.current
-
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -272,7 +324,16 @@ fun SearchDialog(
                 } else if (nutritionData.isNotEmpty()) {
                     SearchResults(
                         nutritionData = nutritionData,
-                        onSelectProduct = onSelectProduct,
+                        onSelectProduct = { nutritionData ->
+                            // Add the selected product to the meal
+                            NutritionState.addMeal(nutritionData.mealType, nutritionData)
+
+                            // Callback to handle the selected product
+                            onSelectProduct(nutritionData)
+
+                            // Dismiss the dialog after selecting
+                            onDismiss()
+                        },
                         onDismiss = onDismiss
                     )
                 } else {
@@ -282,6 +343,10 @@ fun SearchDialog(
         }
     }
 }
+
+
+
+
 @Composable
 fun SearchResults(
     nutritionData: List<NutritionData>,

@@ -1,5 +1,8 @@
 package com.gym4every1.models.nutrition_tracking_models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class NutritionData(
     val date: String,
     val mealType: String,
@@ -7,6 +10,6 @@ data class NutritionData(
     val carbs: Float,
     val protein: Float,
     val fat: Float,
-    val productName: String = "",  // Added product name for display
-    val imageUrl: String = ""  // Added image URL for displaying product image
+    val productName: String = "",
+    val imageUrl: String = ""
 )
