@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import com.gym4every1.routes.app_routes.components.BottomNavigationBar
 import com.gym4every1.routes.app_routes.components.TopBar
 import com.gym4every1.routes.app_routes.explore.ExploreScreen
+import com.gym4every1.routes.app_routes.explore.WorkoutScreen
 import com.gym4every1.routes.app_routes.feed.FeedScreen
 import com.gym4every1.routes.app_routes.profile.ProfileScreen
 import com.gym4every1.routes.app_routes.stats.MealDetailsScreen
@@ -78,6 +79,17 @@ fun SecondNavigation(
                     MealDetailsScreen(
                         mealType = backStackEntry.arguments?.getString("mealType") ?: "",
                     )
+                }
+                composable(
+                    "workoutScreen/{workoutName}/{imageUrl}",
+                    arguments = listOf(
+                        navArgument("workoutName") { type = NavType.StringType },
+                        navArgument("imageUrl") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val workoutName = backStackEntry.arguments?.getString("workoutName") ?: "Cardio"
+                    val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+                    WorkoutScreen(navController, paddingValues, programName = workoutName, thumbnailUrl = imageUrl)
                 }
                 composable("profilePage") { ProfileScreen(navController, supabaseClient, paddingValues) }
             }
